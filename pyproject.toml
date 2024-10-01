@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=72.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cmx-coffe-rest_MORRISWA"
+version = "0.0.1.dev0"
+authors = [
+  { name="William Morris", email="william@morriswa.org" },
+]
+description = "Coffee eCommerce Rest API"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "boto3==1.34.156",
+    "djangorestframework==3.15.2",
+    "setuptools==72.1.0",
+    "django-cors-headers==4.4.0",
+    "psycopg2-binary==2.9.9",
+    "python-dateutil==2.9.0.post0",
+    "python-dotenv==1.0.1",
+    "gunicorn==23.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/morriswa/cmx-coffee-rest"

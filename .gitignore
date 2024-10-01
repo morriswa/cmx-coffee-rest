@@ -1,0 +1,18 @@
+### venv ###
+bin/
+include/
+lib/
+pyvenv.cfg
+
+### ides ###
+.idea/
+.vscode/
+
+### pyjunk ###
+**/__pycache__/
+**.egg-info
+build/
+testdb
+
+### secrets ###
+secrets.properties
