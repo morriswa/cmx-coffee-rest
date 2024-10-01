@@ -33,10 +33,10 @@
       SECRET_KEY=a_bunch_of_nonsense
 - Setup development database
 
-      ./src/manage.py migrate
+      ./manage.py migrate
 - Run on local machine http://localhost:8000
       
-      ./src/manage.py runserver
+      ./manage.py runserver
 
 ## Django Migrate Guide
 please note all database scripts are located in src/core/migrations 
@@ -44,12 +44,12 @@ and all sql commands are stored in src/*/daos.py
 
 - Reset app database
 
-      ./src/manage.py migrate core zero
+      ./manage.py migrate core zero
 - Migrate app database to specific version 
   (replace xxxx with migration code eg 0001, 0002, etc) 
 
-      ./src/manage.py migrate core xxxx
+      ./manage.py migrate core xxxx
 
 - Migrate app database to latest version
 
-      ./src/manage.py migrate 
+      ./manage.py migrate 
