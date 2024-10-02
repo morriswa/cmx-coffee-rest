@@ -4,9 +4,9 @@ import logging
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-# from app.auth0authorization import jwt_decode_token
 from app.decorators import any_view, secure_view, admin_view
 from app.views import AdminView
+from app.authentication import JwtUser
 
 
 @any_view(['GET'])
@@ -17,15 +17,16 @@ def health(request: Request) -> Response:
         "msg": "hello world!"
     }, status=200)
 
-
 @secure_view(['GET'])
 def secure_health(request: Request) -> Response:
     """ health endpoint to test any_view """
     #returns a simple JSON response with message hello world
 
+    user: JwtUser = request.user
+
     return Response({
         "msg": "hello jwt world!",
-        "jwt": request.user.token
+        "decoded_jwt": user.token
     }, status=200)
 
 @admin_view(['GET'])
@@ -34,5 +35,5 @@ def admin_secure_health(request: Request) -> Response:
     #returns a simple JSON response with message hello world
     return Response({
         "msg": "hello admin world!",
-        "jwt": request.user.token
+        "decoded_jwt": request.user.token
     }, status=200)

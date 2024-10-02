@@ -4,30 +4,20 @@
 """
 
 import json
-import os
 import jwt
 import logging
+import os
 import requests
-from typing import override
+from functools import wraps
+from typing import override, Optional
 
 from django.conf import settings
 from django.contrib.auth import authenticate
 from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
-from functools import wraps
 
 
-def _jwt_get_username_from_payload_handler(payload):
-    """
-        provides core authentication utils
-        source: https://auth0.com/docs/quickstart/backend/django/01-authorization
-    """
-    username = payload.get('sub').replace('|', '.')
-    authenticate(remote_user=username)
-    return username
-
-
-def _jwt_decode_token(token):
+def _jwt_decode_token(token) -> dict:
     """
         provides core authentication utils
         source: https://auth0.com/docs/quickstart/backend/django/01-authorization
@@ -37,7 +27,8 @@ def _jwt_decode_token(token):
     public_key = None
     for jwk in jwks['keys']:
         if jwk['kid'] == header['kid']:
-            public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
+            decoded_jwk = json.dumps(jwk)
+            public_key = jwt.algorithms.RSAAlgorithm.from_jwk(decoded_jwk)
 
     if public_key is None:
         raise Exception('Public key not found.')
@@ -50,7 +41,6 @@ def _jwt_decode_token(token):
         algorithms=settings.JWT_ALGORITHM
     )
 
-
 def _get_token_auth_header(request):
     """
         Obtains the Access Token from the Authorization Header
@@ -62,9 +52,17 @@ def _get_token_auth_header(request):
 
     return token
 
+def _get_email_decoded_jwt(payload):
+    """
+        gets email from decoded jwt
+    """
+    email = payload.get('email')
+    authenticate(remote_user=email)
+    return email
 
+
+# publics
 def jwt_has_scope(decoded_token, required_scopes) -> bool:
-
     token_scope_str = decoded_token.get("scope")
     if token_scope_str:
         token_scopes = token_scope_str.split()
@@ -76,15 +74,17 @@ def jwt_has_scope(decoded_token, required_scopes) -> bool:
 
 class JwtUser:
     """ stores token info """
-    def __init__(self, token):
-        self.username = _jwt_get_username_from_payload_handler(token)
-        self.token = token
+    def __init__(self, token: dict):
+        self.username = _get_email_decoded_jwt(token)
+        self.token: dict = token
         self.is_authenticated = True
 
 
 class JwtAuthentication(BaseAuthentication):
+    """ provides jwt authentication filter, imported in drf """
     @override
-    def authenticate(self, request):
+    def authenticate(self, request) -> Optional[tuple[JwtUser, dict]]:
+        """ :return None if auth request was rejected, else User, Auth tuple """
         token = _get_token_auth_header(request)
         if token is None:
             return None
