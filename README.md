@@ -10,16 +10,28 @@
 ## Project Setup Guide
 - Install python 3.12 https://www.python.org/downloads/
 - Open project root directory in terminal
-- Install project environment
+- Activate Project environment
+    - Mac/Linux
 
-      python3.12 -m venv .
-      source bin/activate
-    - NOTE: to deactivate project environment
+          source bin/activate
+        - NOTE: to deactivate project environment
 
-          deactivate
-    - NOTE: to reset project environment (macos, linux, powershell?)
+              deactivate
+        - NOTE: to reset project environment 
 
-          rm -rf bin include lib pyvenv.cfg
+              rm -rf bin include lib pyvenv.cfg
+    - Windows Powershell
+
+          .\Scripts\activate
+        - NOTE: to deactivate project environment
+
+              .\Scripts\deactivate.bat
+        - NOTE: to reset project environment 
+
+              rm -r include
+              rm -r lib 
+              rm -r scripts
+              rm -r pyvenv.cfg
 - Install project in development mode and dependencies with PIP 
 
       pip install -e .
@@ -33,10 +45,19 @@
       SECRET_KEY=a_bunch_of_nonsense
 - Setup development database
 
-      ./manage.py migrate
+      python manage.py migrate
 - Run on local machine http://localhost:8000
       
-      ./manage.py runserver
+      python manage.py runserver
+
+## Test Setup Guide
+- Log into postgres console on your machine with admin credential 
+and run following commands
+
+      create role testuser with createdb login password 'testpassword';
+- Run test script
+      
+      python test.py
 
 ## Django Migrate Guide
 please note all database scripts are located in src/core/migrations 
@@ -44,12 +65,12 @@ and all sql commands are stored in src/*/daos.py
 
 - Reset app database
 
-      ./manage.py migrate core zero
+      python manage.py migrate core zero
 - Migrate app database to specific version 
   (replace xxxx with migration code eg 0001, 0002, etc) 
 
-      ./manage.py migrate core xxxx
+      python manage.py migrate core xxxx
 
 - Migrate app database to latest version
 
-      ./manage.py migrate 
+      python manage.py migrate 
