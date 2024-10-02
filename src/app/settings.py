@@ -73,30 +73,6 @@ TEMPLATES = [
     },
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'app.authentication.JwtAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
-}
-
-JWT_AUTH = {
-    # 'JWT_RESPONSE_PAYLOAD_HANDLER':
-    #     'app.auth0authorization.do_something',
-    # 'JWT_PAYLOAD_GET_USERNAME_HANDLER':
-    #     'app.auth0authorization.jwt_get_username_from_payload_handler',
-    # 'JWT_DECODE_HANDLER':
-    #     'app.auth0authorization.jwt_decode_token',
-    'JWT_ALGORITHM': 'RS256',
-    'JWT_AUDIENCE': f'{os.getenv('AUTH0_AUDIENCE')}',
-    'JWT_ISSUER': f'https://{os.getenv('AUTH0_DOMAIN')}/',
-    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
-}
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -125,6 +101,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Step 4)
 # Init data sources
 DATABASES = {
@@ -137,3 +114,24 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),
     }
 }
+
+
+# Step 5)
+# security setup
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'app.authentication.JwtAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+    'EXCEPTION_HANDLER': 'app.exceptions.app_exception_handler'
+}
+
+JWT_ALGORITHM=os.getenv('AUTH0_JWT_ALGORITHM', 'RS256').split(',')
+JWT_AUDIENCE=os.getenv('AUTH0_AUDIENCE')
+JWT_ISSUER=f'https://{os.getenv('AUTH0_DOMAIN')}/'
+
+ADMIN_SCOPE = 'cmx_coffee:admin'

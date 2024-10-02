@@ -36,13 +36,3 @@ def admin_secure_health(request: Request) -> Response:
         "msg": "hello admin world!",
         "jwt": request.user.token
     }, status=200)
-
-class AdminSecureHealthView(AdminView):
-    @staticmethod
-    def get(request: Request) -> Response:
-        """ health endpoint to test any_view """
-        #returns a simple JSON response with message hello world
-        return Response({
-            "msg": "hello admin world 2!",
-            "jwt": request.user.token
-        }, status=200)

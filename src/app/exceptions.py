@@ -4,6 +4,7 @@ from functools import wraps
 from typing import override
 
 from rest_framework.response import Response
+from rest_framework import exceptions
 
 
 class _APIException(ABC):
@@ -60,3 +61,16 @@ class ValidationException(BadRequestException):
         "field": self.field,
         "error": self.error
     }
+
+def app_exception_handler(exc, context):
+    """ application exception handler, passed to drf in settings.py """
+
+    if isinstance(exc, APIException):
+        return exc.response()
+
+    if isinstance(exc, exceptions.AuthenticationFailed) or isinstance(exc, exceptions.PermissionDenied):
+        return Response({"msg": exc.detail}, status=exc.status_code)
+
+    # default case
+    logging.error(f"encountered unexpected exception {exc.__class__.__name__}: {str(exc)}")
+    return Response({"msg": "Unexpected server error, please contact your system administrator."}, status=500)

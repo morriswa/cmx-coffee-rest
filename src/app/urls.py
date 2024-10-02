@@ -26,5 +26,4 @@ urlpatterns = [
     path('health', core_views.health),
     path('shealth', core_views.secure_health),
     path('ahealth', core_views.admin_secure_health),
-    path('ahealth2', core_views.admin_secure_health),
 ]

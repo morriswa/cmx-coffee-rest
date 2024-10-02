@@ -33,7 +33,7 @@ def _jwt_decode_token(token):
         source: https://auth0.com/docs/quickstart/backend/django/01-authorization
     """
     header = jwt.get_unverified_header(token)
-    jwks = requests.get(f'{settings.JWT_AUTH['JWT_ISSUER']}/.well-known/jwks.json').json()
+    jwks = requests.get(f'{settings.JWT_ISSUER}/.well-known/jwks.json').json()
     public_key = None
     for jwk in jwks['keys']:
         if jwk['kid'] == header['kid']:
@@ -42,8 +42,13 @@ def _jwt_decode_token(token):
     if public_key is None:
         raise Exception('Public key not found.')
 
-    issuer = settings.JWT_AUTH['JWT_ISSUER']
-    return jwt.decode(token, public_key, audience=settings.JWT_AUTH['JWT_AUDIENCE'], issuer=issuer, algorithms=['RS256'])
+    return jwt.decode(
+        token,
+        public_key,
+        audience=settings.JWT_AUDIENCE,
+        issuer=settings.JWT_ISSUER,
+        algorithms=settings.JWT_ALGORITHM
+    )
 
 
 def _get_token_auth_header(request):

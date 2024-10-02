@@ -1,12 +1,9 @@
 from typing import override
 
+from django.conf import settings
 from rest_framework.permissions import BasePermission
 
 from app.authentication import jwt_has_scope, JwtUser
-
-
-ADMIN_SCOPE = 'cmx_coffee:admin'
-
 
 
 class HasAdminPermission(BasePermission):
@@ -16,4 +13,4 @@ class HasAdminPermission(BasePermission):
         user: JwtUser = request.user
         print(user.token)
         decoded = user.token
-        return jwt_has_scope(decoded, [ADMIN_SCOPE])
+        return jwt_has_scope(decoded, [settings.ADMIN_SCOPE])
