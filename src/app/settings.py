@@ -27,6 +27,12 @@ load_dotenv('default.properties')
 
 # Step 3)
 # setup django for rest application
+
+# declare modules in the current app
+APP_MODULES = [
+    "core"
+]
+
 INSTALLED_APPS = [
     # django apps
     'django.contrib.auth',
@@ -35,8 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'rest_framework',
     'corsheaders',
-    # api modules
-    'core',
+    # include app modules
+    *APP_MODULES,
 ]
 
 MIDDLEWARE = [
