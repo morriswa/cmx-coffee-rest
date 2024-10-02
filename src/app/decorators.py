@@ -8,7 +8,8 @@ from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 
 from app.exceptions import APIException
-from app.auth import User
+from app.authentication import JwtUser, jwt_has_scope
+from app.permissions import HasAdminPermission
 
 
 def app_exception_handler(f):
@@ -50,19 +51,16 @@ def requires_scope(
         @wraps(f)
         def decorated(*args, **kwargs):
             request = args[0]
-            user: User = request.user
+            user: JwtUser = request.user
             decoded = user.token
-            if decoded.get("scope"):
-                token_scopes = decoded["scope"].split()
-                for token_scope in token_scopes:
-                    if token_scope in required_scopes:
-                        return f(*args, **kwargs)
-            response = Response({'msg': or_else_error})
-            response.status_code = 403
-            return response
-        return decorated
-    return require_scope
+            if jwt_has_scope(decoded, required_scopes):
+                return f(*args, **kwargs)
+            else:
+                return Response(status=403, data={'msg': or_else_error})
 
+        return decorated
+
+    return require_scope
 
 def any_view(methods):
     """ view for unsecured requests
@@ -93,7 +91,7 @@ def admin_view(methods):
 
     def wrapper(func):
         return _error_handling_view(methods)(
-            requires_scope('cmx_coffee:admin')(
+            permission_classes([HasAdminPermission])(
                 func
             )
         )

@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from app.decorators import app_exception_handler, requires_scope
+from app.permissions import HasAdminPermission
 
 
 class _ErrorHandlingView(APIView):
@@ -24,7 +25,4 @@ class SecureView(_ErrorHandlingView):
     pass
 
 class AdminView(_ErrorHandlingView):
-    @override
-    @requires_scope(['cmx_coffee:admin'])
-    def dispatch(self, request, *args, **kwargs):
-        return super(AdminView, self).dispatch(request, *args, **kwargs)
+    permission_classes = [HasAdminPermission]

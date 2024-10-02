@@ -58,7 +58,19 @@ def _get_token_auth_header(request):
     return token
 
 
-class User:
+def jwt_has_scope(decoded_token, required_scopes) -> bool:
+
+    token_scope_str = decoded_token.get("scope")
+    if token_scope_str:
+        token_scopes = token_scope_str.split()
+        for token_scope in token_scopes:
+            if token_scope in required_scopes:
+                return True
+    return False
+
+
+class JwtUser:
+    """ stores token info """
     def __init__(self, token):
         self.username = _jwt_get_username_from_payload_handler(token)
         self.token = token
@@ -74,7 +86,7 @@ class JwtAuthentication(BaseAuthentication):
 
         try:
             payload = _jwt_decode_token(token)
-            return User(payload), payload
+            return JwtUser(payload), payload
         except jwt.ExpiredSignatureError:
             msg = _('Token has expired.')
             raise exceptions.AuthenticationFailed(msg)
