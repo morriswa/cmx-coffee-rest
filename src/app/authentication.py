@@ -93,11 +93,8 @@ class JwtAuthentication(BaseAuthentication):
             payload = _jwt_decode_token(token)
             return JwtUser(payload), payload
         except jwt.ExpiredSignatureError:
-            msg = _('Token has expired.')
-            raise exceptions.AuthenticationFailed(msg)
+            raise exceptions.AuthenticationFailed('Token has expired.')
         except jwt.DecodeError:
-            msg = _('Error decoding token.')
-            raise exceptions.AuthenticationFailed(msg)
+            raise exceptions.AuthenticationFailed('Error decoding token.')
         except jwt.InvalidTokenError:
-            msg = _('Invalid token.')
-            raise exceptions.AuthenticationFailed(msg)
+            raise exceptions.AuthenticationFailed('Invalid token.')
