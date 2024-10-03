@@ -10,6 +10,9 @@
 ## Project Setup Guide
 - Install python 3.12 https://www.python.org/downloads/
 - Open project root directory in terminal
+- Install Project environment
+
+      python3.12 -m venv .
 - Activate Project environment
     - Mac/Linux
 
