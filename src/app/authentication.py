@@ -62,15 +62,33 @@ def _get_email_decoded_jwt(payload):
 
 
 # publics
-def jwt_has_scope(decoded_token, required_scopes) -> bool:
+def jwt_has_scope(decoded_token, required_scopes: list[str]) -> bool:
+    # retrieve scope string from token
     token_scope_str = decoded_token.get("scope")
-    if token_scope_str:
-        token_scopes = token_scope_str.split()
-        for token_scope in token_scopes:
-            if token_scope in required_scopes:
-                return True
-    return False
 
+    has_all_scopes = True
+
+    if token_scope_str:  # if scope was present
+        token_scopes = token_scope_str.split()  # split on whitespace
+        for token_scope in required_scopes:
+            # make sure all required scopes are present in token's provided scopes
+            if token_scope not in token_scopes:
+                has_all_scopes = False
+
+    return has_all_scopes
+
+def jwt_has_permissions(decoded_token, required_permissions: list[str]) -> bool:
+    # retrieve scope string from
+    token_permissions = decoded_token.get('permissions') or []
+
+    has_all_permissions = True
+
+    for permission in required_permissions:
+        # make sure all required permissions are present in token's provided permission array
+        if permission not in token_permissions:
+            has_all_permissions = False
+
+    return has_all_permissions
 
 class JwtUser:
     """ stores token info """

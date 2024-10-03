@@ -8,12 +8,12 @@ from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 
 from app.exceptions import APIException
-from app.authentication import JwtUser, jwt_has_scope
+from app.authentication import JwtUser, jwt_has_permissions
 from app.permissions import HasAdminPermission
 
 
-def requires_scope(
-        required_scopes: list[str],
+def requires_permissions(
+        required_permissions: list[str],
         or_else_error = 'You don\'t have access to this resource'
 ):
     """Determines if the required scope is present in the Access Token
@@ -21,20 +21,20 @@ def requires_scope(
             required_scope (str): The scope required to access the resource
         Source: https://auth0.com/docs/quickstart/backend/django/01-authorization
     """
-    def require_scope(f):
+    def require_permissions(f):
         @wraps(f)
         def decorated(*args, **kwargs):
             request = args[0]
             user: JwtUser = request.user
             decoded = user.token
-            if jwt_has_scope(decoded, required_scopes):
+            if jwt_has_permissions(decoded, required_scopes):
                 return f(*args, **kwargs)
             else:
                 return Response(status=403, data={'msg': or_else_error})
 
         return decorated
 
-    return require_scope
+    return require_permissions
 
 def any_view(methods):
     """ view for unsecured requests

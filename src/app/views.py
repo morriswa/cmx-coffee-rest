@@ -3,7 +3,6 @@ from typing import override
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from app.decorators import requires_scope
 from app.permissions import HasAdminPermission
 
 

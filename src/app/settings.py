@@ -141,3 +141,4 @@ JWT_AUDIENCE=os.getenv('AUTH0_AUDIENCE')
 JWT_ISSUER=f'https://{os.getenv('AUTH0_DOMAIN')}/'
 
 ADMIN_SCOPE = 'cmx_coffee:admin'
+ADMIN_PERMISSION = ADMIN_SCOPE

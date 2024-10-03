@@ -3,14 +3,16 @@ from typing import override
 from django.conf import settings
 from rest_framework.permissions import BasePermission
 
-from app.authentication import jwt_has_scope, JwtUser
+from app.authentication import jwt_has_permissions, JwtUser
 
 
 class HasAdminPermission(BasePermission):
+    """ django permission class to check if a user has admin access """
 
     @override
-    def has_permission(self, request, view):
+    def has_permission(self, request, view) -> bool:
         user: JwtUser = request.user
-        print(user.token)
+        # retrieve decoded token from user obj
         decoded = user.token
-        return jwt_has_scope(decoded, [settings.ADMIN_SCOPE])
+        # checks if admin scope is on the verified token
+        return jwt_has_permissions(decoded, [settings.ADMIN_PERMISSION])
