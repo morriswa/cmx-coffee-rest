@@ -24,6 +24,6 @@ import core.views as core_views
 urlpatterns = [
     # core app
     path('health', core_views.health),
-    path('shealth', core_views.secure_health),
-    path('ahealth', core_views.admin_secure_health),
+    path('s/health', core_views.secure_health),
+    path('a/health', core_views.admin_secure_health),
 ]
