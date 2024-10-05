@@ -12,7 +12,7 @@ from app.authentication import JwtUser
 @any_view(['GET'])
 def health(request: Request) -> Response:
     """ health endpoint to test any_view """
-    #returns a simple JSON response with message hello world 
+    #returns a simple JSON response with message hello world
     return Response({
         "msg": "hello world!"
     }, status=200)
@@ -36,4 +36,21 @@ def admin_secure_health(request: Request) -> Response:
     return Response({
         "msg": "hello admin world!",
         "decoded_jwt": request.user.token
+    }, status=200)
+
+@secure_view(['GET'])
+def login(request: Request) -> Response:
+    """ health endpoint to test any_view """
+    #returns a simple JSON response with message hello world
+
+    user: JwtUser = request.user
+
+    logging.info(user.token)
+
+    perms = user.token.get('permissions') or []
+
+    logging.info(perms)
+
+    return Response({
+        "permissions": perms
     }, status=200)

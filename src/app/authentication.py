@@ -47,6 +47,8 @@ def _get_token_auth_header(request):
         source: https://auth0.com/docs/quickstart/backend/django/01-authorization
     """
     auth = request.META.get("HTTP_AUTHORIZATION", None)
+    if auth is None:
+        raise exceptions.AuthenticationFailed('Failed to provide Authorization header', code=401)
     parts = auth.split()
     token = parts[1]
 
