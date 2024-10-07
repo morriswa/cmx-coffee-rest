@@ -30,7 +30,8 @@ load_dotenv('default.properties')
 
 # declare modules in the current app
 APP_MODULES = [
-    "core"
+    'core',
+    'vendor',
 ]
 
 INSTALLED_APPS = [
