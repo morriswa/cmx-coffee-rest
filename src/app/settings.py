@@ -142,3 +142,4 @@ JWT_ISSUER=f'https://{os.getenv('AUTH0_DOMAIN')}/'
 
 ADMIN_SCOPE = 'cmx_coffee:admin'
 ADMIN_PERMISSION = ADMIN_SCOPE
+VENDOR_PERMISSION = 'cmx_coffee:vendor'

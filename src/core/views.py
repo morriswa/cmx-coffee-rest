@@ -1,6 +1,7 @@
 import json
 import logging
 
+from django.conf import settings
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -45,11 +46,9 @@ def login(request: Request) -> Response:
 
     user: JwtUser = request.user
 
-    logging.info(user.token)
-
     perms = user.token.get('permissions') or []
 
-    logging.info(perms)
+    perms.append(settings.VENDOR_PERMISSION)
 
     return Response({
         "permissions": perms
