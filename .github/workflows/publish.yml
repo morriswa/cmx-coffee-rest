@@ -1,0 +1,72 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+#
+# AUTHOR: William A. Morris
+# CREATION_DATE: 2024-08-28
+# PURPOSE:
+#   whenever new code is pushed to the main branch, this file will execute the following steps
+#   in order to publish this application as a Docker Container on Dockerhub
+#   - run unit tests
+#   - build the project and create a Java ARchive (JAR)
+#   - create Docker Container from generated application artifacts
+#   - publish container
+
+name: Build, Test, Publish
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+
+        env:
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_USER: testuser
+          POSTGRES_DB: testdb
+
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Login to Docker
+      uses: docker/login-action@v3
+      with:
+        username: morriswa
+        password: ${{ secrets.DOCKERPASSWORD }}
+
+    - name: Build and Publish to Docker Hub
+      run: |
+        export APP_VERSION=$(grep -m1 '^version =' pyproject.toml | awk -F'=' '{print $2}' | sed 's/[", ]//g')
+
+        python3.12 -m venv .
+        source bin/activate
+
+        pip install .
+
+        ./manage.py check
+        ./test.py
+
+        deactivate
+
+        docker build . -t morriswa/cmx-coffee-rest:$APP_VERSION
+        docker push morriswa/cmx-coffee-rest:$APP_VERSION
