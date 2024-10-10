@@ -14,6 +14,8 @@ CORS_EXPOSE_HEADERS = ["authorization", "content-type", "content-length"]
 CORS_ALLOW_HEADERS = CORS_EXPOSE_HEADERS
 CORS_ALLOWED_ORIGINS = [
     'https://www.morriswa.org',
+    'http://localhost:4200',
+    'http://localhost:3000',
 ]
 ALLOWED_HOSTS = [
     'www.morriswa.org',
