@@ -5,9 +5,11 @@ from django.conf import settings
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from app.decorators import any_view, secure_view, admin_view
+from app.decorators import any_view, secure_view, admin_view, user_view
 from app.views import AdminView
 from app.authentication import JwtUser
+
+import core.daos as dao
 
 
 @any_view(['GET'])
@@ -45,6 +47,8 @@ def login(request: Request) -> Response:
     #returns a simple JSON response with message hello world
 
     user: JwtUser = request.user
+
+    dao.register(user.username)
 
     perms = user.token.get('permissions') or []
 

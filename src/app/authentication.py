@@ -16,6 +16,7 @@ from django.contrib.auth import authenticate
 from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 
+import app.connections
 
 def _jwt_decode_token(token) -> dict:
     """
@@ -61,6 +62,19 @@ def _get_email_decoded_jwt(payload):
     email = payload.get('email')
     authenticate(remote_user=email)
     return email
+
+
+def _get_user_id_from_db(email: str):
+    with app.connections.cursor() as cursor:
+        cursor.execute(
+            "select user_id from auth_integration where email = %(email)s",
+            {'email': email}
+        )
+        result = cursor.fetchone()
+        if result is None:
+            raise exceptions.AuthenticationFailed('could not find user id, have you registered?')
+        else:
+            return result['user_id']
 
 
 # publics
@@ -112,6 +126,38 @@ class JwtAuthentication(BaseAuthentication):
         try:
             payload = _jwt_decode_token(token)
             return JwtUser(payload), payload
+        except jwt.ExpiredSignatureError:
+            raise exceptions.AuthenticationFailed('Token has expired.')
+        except jwt.DecodeError:
+            raise exceptions.AuthenticationFailed('Error decoding token.')
+        except jwt.InvalidTokenError:
+            raise exceptions.AuthenticationFailed('Invalid token.')
+
+class User:
+    """ stores token info """
+    def __init__(self, email: str, user_id):
+        self.email = email
+        self.user_id = user_id
+        self.username = self.email
+        self.is_authenticated = True
+
+
+class UserAuthenticationWithJwt(BaseAuthentication):
+    """ provides jwt authentication filter, imported in drf """
+    @override
+    def authenticate(self, request) -> Optional[tuple[JwtUser, dict]]:
+        """ :return None if auth request was rejected, else User, Auth tuple """
+        token = _get_token_auth_header(request)
+        if token is None:
+            return None
+
+        try:
+            payload = _jwt_decode_token(token)
+
+            email = _get_email_decoded_jwt(payload)
+            user_id = _get_user_id_from_db(email)
+
+            return User(email, user_id), payload
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('Token has expired.')
         except jwt.DecodeError:

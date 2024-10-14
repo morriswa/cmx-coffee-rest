@@ -8,7 +8,7 @@ from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 
 from app.exceptions import APIException
-from app.authentication import JwtUser, jwt_has_permissions
+from app.authentication import JwtUser, jwt_has_permissions, UserAuthenticationWithJwt
 from app.permissions import HasAdminPermission
 
 
@@ -58,6 +58,23 @@ def secure_view(methods):
         return api_view(methods)(func)
 
     return wrapper
+
+
+def user_view(methods):
+    """ view for secured requests
+        includes error handling from morriswa package"""
+
+    def wrapper(func):
+        return api_view(methods)(
+            permission_classes([])(
+                authentication_classes([UserAuthenticationWithJwt])(
+                    func
+                )
+            )
+        )
+
+    return wrapper
+
 
 def admin_view(methods):
     """ view for secured requests

@@ -6,8 +6,9 @@ from rest_framework.permissions import BasePermission
 from app.authentication import jwt_has_permissions, JwtUser
 
 
-class HasAdminPermission(BasePermission):
-    """ django permission class to check if a user has admin access """
+class HasPermission(BasePermission):
+    def __init__(self, permission):
+        self.permission = permission
 
     @override
     def has_permission(self, request, view) -> bool:
@@ -15,4 +16,11 @@ class HasAdminPermission(BasePermission):
         # retrieve decoded token from user obj
         decoded = user.token
         # checks if admin scope is on the verified token
-        return jwt_has_permissions(decoded, [settings.ADMIN_PERMISSION])
+        return jwt_has_permissions(decoded, [pemission])
+
+
+class HasAdminPermission(HasPermission):
+    """ django permission class to check if a user has admin access """
+
+    def __init__(self):
+        super(settings.ADMIN_PERMISSION)

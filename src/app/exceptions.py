@@ -1,7 +1,7 @@
 import logging
 from abc import abstractmethod, ABC
 from functools import wraps
-from typing import override
+from typing import override, Self
 
 from rest_framework.response import Response
 from rest_framework import exceptions
@@ -52,15 +52,12 @@ class ValidationException(BadRequestException):
     """ exception to raise for model validation errors
         :author William Morris
     """
-    def __init__(self, field, error):
-        self.field = field
-        super().__init__(error)
+    def __init__(self, errors):
+        self.errors = errors
+        super().__init__('A Validation Exception has Occured!')
 
     @override
-    def json(self): return {
-        "field": self.field,
-        "error": self.error
-    }
+    def json(self): return [{'field':error[0], 'error': error[1]} for error in self.errors]
 
 def app_exception_handler(exc, context):
     """ application exception handler, passed to drf in settings.py """

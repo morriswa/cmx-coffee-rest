@@ -3,6 +3,7 @@ from typing import override
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
+from app.authentication import UserAuthenticationWithJwt
 from app.permissions import HasAdminPermission
 
 
@@ -14,6 +15,10 @@ class AnyView(APIView):
 
 class SecureView(APIView):
     pass
+
+class UserView(APIView):
+    permission_classes = []
+    authentication_classes = [UserAuthenticationWithJwt]
 
 class AdminView(APIView):
     permission_classes = [HasAdminPermission]
