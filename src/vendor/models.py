@@ -10,8 +10,8 @@ from app.validation import ValidatedDataModel
 class VendorApplicationRequest(ValidatedDataModel):
     def __init__(self, **kwargs):
         self.business_name = kwargs.get('business_name')
-        self.address_line_one = kwargs.get('address_line_one')
-        self.address_line_two = kwargs.get('address_line_two')
+        self.address_line_one = kwargs.get('address_line_one') or kwargs.get('address_one')
+        self.address_line_two = kwargs.get('address_line_two') or kwargs.get('address_two')
         self.city = kwargs.get('city')
         self.state = kwargs.get('state')
         self.zip = kwargs.get('zip')
@@ -51,3 +51,23 @@ class VendorApplicationRequest(ValidatedDataModel):
 
         if len(validation_exceptions) > 0:
             raise ValidationException(validation_exceptions)
+
+
+
+class VendorApplicationResponse(VendorApplicationRequest):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        super().validate()
+
+        self.application_id = kwargs.get('application_id')
+        self.status = kwargs.get('status')
+        self.application_date = kwargs.get('application_date')
+
+        if self.application_id is None:
+            raise ValueError('application_id should never be null')
+
+        if self.status is None:
+            raise ValueError('status should never be null')
+
+        if self.application_date is None:
+            raise ValueError('application_date should never be null')

@@ -27,7 +27,8 @@ class APIException(Exception, _APIException):
         :author William Morris
     """
 
-    def __init__(self, error: str): self.error = error
+    def __init__(self, error: str):
+        self.error = error
 
     @override
     def json(self): return {
@@ -35,17 +36,20 @@ class APIException(Exception, _APIException):
     }
 
     @override
-    def response(self) -> Response: return Response(self.json(), status=500)
+    def response(self) -> Response:
+        return Response(self.json(), status=500)
 
 
 class BadRequestException(APIException):
     """ exception to raise for errors caused by a bad user request
         :author William Morris
     """
-    def __init__(self, error: str): super().__init__(error)
+    def __init__(self, error: str):
+        super().__init__(error)
 
     @override
-    def response(self) -> Response: return Response(self.json(), status=400)
+    def response(self) -> Response:
+        return Response(self.json(), status=400)
 
 
 class ValidationException(BadRequestException):
@@ -53,8 +57,8 @@ class ValidationException(BadRequestException):
         :author William Morris
     """
     def __init__(self, errors):
-        self.errors = errors
         super().__init__('A Validation Exception has Occured!')
+        self.errors = errors
 
     @override
     def json(self): return [{'field':error[0], 'error': error[1]} for error in self.errors]

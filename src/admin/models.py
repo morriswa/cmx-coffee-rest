@@ -1,3 +1,3 @@
 """
-    Vendor-related data models go here
+    Admin-related data models go here
 """

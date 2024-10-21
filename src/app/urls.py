@@ -19,7 +19,7 @@ from django.urls import path
 
 import core.views as core_views
 import vendor.views as vendor_views
-
+import admin.views as admin_views
 
 
 urlpatterns = [
@@ -29,5 +29,7 @@ urlpatterns = [
     path('a/health', core_views.admin_secure_health),
     path('login', core_views.login),
     # vendor application
-    path('s/forms/vendor-application', vendor_views.apply_for_vendor)
+    path('s/forms/vendor-application', vendor_views.apply_for_vendor),
+    # admin
+    path('a/vendor-applications', admin_views.get_pending_vendor_applications),
 ]

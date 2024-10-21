@@ -21,9 +21,7 @@ class Migration(migrations.Migration):
                     phone varchar(12) not null ,
                     business_email varchar(256) not null unique ,
                     status char(1) not null default 'N',
-                    application_date timestamp not null default current_timestamp ,
-                    approved_by uuid references auth_integration (user_id) ,
-                    approved_on timestamp
+                    application_date timestamp not null default current_timestamp
                 );
             """,
             reverse_sql="""
