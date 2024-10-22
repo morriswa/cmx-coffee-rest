@@ -126,14 +126,6 @@ DATABASES = {
 # Step 5)
 # security setup
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'app.authentication.JwtAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
     'EXCEPTION_HANDLER': 'app.exceptions.app_exception_handler'
 }
 
@@ -141,6 +133,16 @@ JWT_ALGORITHM=os.getenv('AUTH0_JWT_ALGORITHM', 'RS256').split(',')
 JWT_AUDIENCE=os.getenv('AUTH0_AUDIENCE')
 JWT_ISSUER=f'https://{os.getenv('AUTH0_DOMAIN')}/'
 
-ADMIN_SCOPE = 'cmx_coffee:admin'
-ADMIN_PERMISSION = ADMIN_SCOPE
-VENDOR_PERMISSION = 'cmx_coffee:vendor'
+ADMIN_PERMISSIONS = ['cmx_coffee:admin']
+USER_PERMISSIONS = ['cmx_coffee:appuser']
+VENDOR_PERMISSIONS = ['cmx_coffee:vendor']
+
+from app.authentication import UserAuthenticationWithJwt
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+DJANGO_USER_AUTHENTICATION_CLASSES = [BasicAuthentication, SessionAuthentication, UserAuthenticationWithJwt]
+
+from app.permissions import WithPermissions
+from rest_framework.permissions import IsAuthenticated
+DJANGO_USER_PERMISSION_CLASSES = [IsAuthenticated]
+DJANGO_VENDOR_PERMISSION_CLASSES = DJANGO_USER_PERMISSION_CLASSES + [WithPermissions(VENDOR_PERMISSIONS)]
+DJANGO_ADMIN_PERMISSION_CLASSES = DJANGO_USER_PERMISSION_CLASSES + [WithPermissions(ADMIN_PERMISSIONS)]

@@ -1,10 +1,8 @@
 from typing import override
 
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-
-from app.authentication import UserAuthenticationWithJwt
-from app.permissions import HasAdminPermission
 
 
 class AnyView(APIView):
@@ -13,12 +11,10 @@ class AnyView(APIView):
     authentication_classes = []
     permission_classes = []
 
-class SecureView(APIView):
-    pass
-
 class UserView(APIView):
-    permission_classes = []
-    authentication_classes = [UserAuthenticationWithJwt]
+    permission_classes = settings.DJANGO_USER_PERMISSION_CLASSES
+    authentication_classes = settings.DJANGO_USER_AUTHENTICATION_CLASSES
 
 class AdminView(APIView):
-    permission_classes = [HasAdminPermission]
+    permission_classes = settings.DJANGO_ADMIN_PERMISSION_CLASSES
+    authentication_classes = settings.DJANGO_USER_AUTHENTICATION_CLASSES

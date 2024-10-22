@@ -18,7 +18,8 @@ from rest_framework import exceptions
 
 import app.connections
 
-def _jwt_decode_token(token) -> dict:
+
+def jwt_decode_token(token) -> dict:
     """
         provides core authentication utils
         source: https://auth0.com/docs/quickstart/backend/django/01-authorization
@@ -42,7 +43,7 @@ def _jwt_decode_token(token) -> dict:
         algorithms=settings.JWT_ALGORITHM
     )
 
-def _get_token_auth_header(request):
+def get_token_auth_header(request):
     """
         Obtains the Access Token from the Authorization Header
         source: https://auth0.com/docs/quickstart/backend/django/01-authorization
@@ -55,7 +56,7 @@ def _get_token_auth_header(request):
 
     return token
 
-def _get_email_decoded_jwt(payload):
+def get_email_decoded_jwt(payload):
     """
         gets email from decoded jwt
     """
@@ -64,7 +65,28 @@ def _get_email_decoded_jwt(payload):
     return email
 
 
-def _get_user_id_from_db(email: str):
+def register_user_in_db(email:str):
+    with app.connections.cursor() as cursor:
+        cursor.execute(
+            "insert into auth_integration (email) values (%(email)s)",
+            {'email': email}
+        )
+        cursor.execute(
+            "select user_id from auth_integration where email = (%(email)s)",
+            {'email': email}
+        )
+        result = cursor.fetchone()
+        if result is None:
+            logging.error(f'failed to register user with email {email}')
+            raise Exception('bad stuff happened')
+
+        user_id = result.get('user_id')
+        logging.info(f'successfully registered user {user_id} with email {email}')
+        return user_id
+
+def get_user_info_from_db(email: str):
+    user_id = None
+    permissions = []
     with app.connections.cursor() as cursor:
         cursor.execute(
             "select user_id from auth_integration where email = %(email)s",
@@ -72,12 +94,21 @@ def _get_user_id_from_db(email: str):
         )
         result = cursor.fetchone()
         if result is None:
-            raise exceptions.AuthenticationFailed('could not find user id, have you registered?')
+            logging.info(f'did not find database entry for user with email {email}')
+            return register_user_in_db(email), []
         else:
-            return result['user_id']
+            user_id = result['user_id']
 
+        cursor.execute(
+            "select 1 as result from vendor where user_id = %(user_id)s",
+            {'user_id': user_id}
+        )
+        result = cursor.fetchone() or {'result': 0}
+        if result.get('result') == 1:
+            permissions.append('cmx_coffee:vendor')
 
-# publics
+    return user_id, permissions
+
 def jwt_has_scope(decoded_token, required_scopes: list[str]) -> bool:
     # retrieve scope string from token
     token_scope_str = decoded_token.get("scope")
@@ -105,62 +136,3 @@ def jwt_has_permissions(decoded_token, required_permissions: list[str]) -> bool:
             has_all_permissions = False
 
     return has_all_permissions
-
-class JwtUser:
-    """ stores token info """
-    def __init__(self, token: dict):
-        self.username = _get_email_decoded_jwt(token)
-        self.token: dict = token
-        self.is_authenticated = True
-
-
-class JwtAuthentication(BaseAuthentication):
-    """ provides jwt authentication filter, imported in drf """
-    @override
-    def authenticate(self, request) -> Optional[tuple[JwtUser, dict]]:
-        """ :return None if auth request was rejected, else User, Auth tuple """
-        token = _get_token_auth_header(request)
-        if token is None:
-            return None
-
-        try:
-            payload = _jwt_decode_token(token)
-            return JwtUser(payload), payload
-        except jwt.ExpiredSignatureError:
-            raise exceptions.AuthenticationFailed('Token has expired.')
-        except jwt.DecodeError:
-            raise exceptions.AuthenticationFailed('Error decoding token.')
-        except jwt.InvalidTokenError:
-            raise exceptions.AuthenticationFailed('Invalid token.')
-
-class User:
-    """ stores token info """
-    def __init__(self, email: str, user_id):
-        self.email = email
-        self.user_id = user_id
-        self.username = self.email
-        self.is_authenticated = True
-
-
-class UserAuthenticationWithJwt(BaseAuthentication):
-    """ provides jwt authentication filter, imported in drf """
-    @override
-    def authenticate(self, request) -> Optional[tuple[JwtUser, dict]]:
-        """ :return None if auth request was rejected, else User, Auth tuple """
-        token = _get_token_auth_header(request)
-        if token is None:
-            return None
-
-        try:
-            payload = _jwt_decode_token(token)
-
-            email = _get_email_decoded_jwt(payload)
-            user_id = _get_user_id_from_db(email)
-
-            return User(email, user_id), payload
-        except jwt.ExpiredSignatureError:
-            raise exceptions.AuthenticationFailed('Token has expired.')
-        except jwt.DecodeError:
-            raise exceptions.AuthenticationFailed('Error decoding token.')
-        except jwt.InvalidTokenError:
-            raise exceptions.AuthenticationFailed('Invalid token.')

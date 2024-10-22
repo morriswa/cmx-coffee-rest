@@ -3,13 +3,13 @@ import jwt
 
 from functools import wraps
 
+from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes, authentication_classes, api_view
-from rest_framework.permissions import IsAuthenticated
 
 from app.exceptions import APIException
-from app.authentication import JwtUser, jwt_has_permissions, UserAuthenticationWithJwt
-from app.permissions import HasAdminPermission
+from app.authentication import User
+from app.permissions import has_permissions
 
 
 def requires_permissions(
@@ -25,9 +25,7 @@ def requires_permissions(
         @wraps(f)
         def decorated(*args, **kwargs):
             request = args[0]
-            user: JwtUser = request.user
-            decoded = user.token
-            if jwt_has_permissions(decoded, required_scopes):
+            if isinstance(request.user, User) and has_permissions(request.user.permissions, required_permissions):
                 return f(*args, **kwargs)
             else:
                 return Response(status=403, data={'msg': or_else_error})
@@ -36,14 +34,15 @@ def requires_permissions(
 
     return require_permissions
 
-def any_view(methods):
+
+def __customized_view(methods, permission_clazzes, authentication_clazzes):
     """ view for unsecured requests
      includes error handling from morriswa package"""
     def wrapper(func):
         return api_view(methods)(
             # override w_view to use no permission or authentication guards
-            permission_classes([])(
-                authentication_classes([])(
+            permission_classes(permission_clazzes)(
+                authentication_classes(authentication_clazzes)(
                     func
                 )
             )
@@ -51,40 +50,28 @@ def any_view(methods):
 
     return wrapper
 
-def secure_view(methods):
-    """ view for secured requests
-        includes error handling from morriswa package"""
-    def wrapper(func):
-        return api_view(methods)(func)
 
-    return wrapper
+def any_view(methods):
+    """ view for unsecured requests
+     includes error handling from morriswa package"""
+    return __customized_view(methods, [], [])
 
 
 def user_view(methods):
     """ view for secured requests
         includes error handling from morriswa package"""
-
-    def wrapper(func):
-        return api_view(methods)(
-            permission_classes([])(
-                authentication_classes([UserAuthenticationWithJwt])(
-                    func
-                )
-            )
-        )
-
-    return wrapper
+    return __customized_view(
+        methods,
+        settings.DJANGO_USER_PERMISSION_CLASSES,
+        settings.DJANGO_USER_AUTHENTICATION_CLASSES
+    )
 
 
 def admin_view(methods):
     """ view for secured requests
         includes error handling from morriswa package"""
-
-    def wrapper(func):
-        return api_view(methods)(
-            permission_classes([HasAdminPermission])(
-                func
-            )
-        )
-
-    return wrapper
+    return __customized_view(
+        methods,
+        settings.DJANGO_ADMIN_PERMISSION_CLASSES,
+        settings.DJANGO_USER_AUTHENTICATION_CLASSES
+    )
