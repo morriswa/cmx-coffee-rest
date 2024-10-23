@@ -7,3 +7,6 @@ class User:
         self.permissions = permissions
         self.username = self.email
         self.is_authenticated = True
+
+    def json(self):
+        return vars(self)

@@ -18,6 +18,7 @@ Including another URLconf
 from django.urls import path
 
 import core.views as core_views
+import customer.views as customer_views
 import vendor.views as vendor_views
 import admin.views as admin_views
 
@@ -30,4 +31,6 @@ urlpatterns = [
     path('s/forms/vendor-application', vendor_views.apply_for_vendor),
     # admin
     path('a/vendor-applications', admin_views.get_pending_vendor_applications),
+    # customer
+    path('profile', customer_views.get_customer_profile)
 ]
