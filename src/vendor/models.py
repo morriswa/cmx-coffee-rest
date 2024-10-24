@@ -62,6 +62,10 @@ class VendorApplicationResponse(VendorApplicationRequest):
         self.application_id = kwargs.get('application_id')
         self.status = kwargs.get('status')
         self.application_date = kwargs.get('application_date')
+        self.formatted_address = (f"{self.address_line_one}, "
+                                  f"{self.address_line_two + ', ' if self.address_line_two is not None else ''}"
+                                  f"{self.city}, "
+                                  f"{self.state} {self.zip}, {self.country}")
 
         if self.application_id is None:
             raise ValueError('application_id should never be null')
