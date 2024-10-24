@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cmx-coffe-rest_MORRISWA"
-version = "0.0.2.dev2"
+version = "0.0.2"
 authors = [
   { name="William Morris", email="william@morriswa.org" },
 ]
