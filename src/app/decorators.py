@@ -66,6 +66,14 @@ def user_view(methods):
         settings.DJANGO_USER_AUTHENTICATION_CLASSES
     )
 
+def vendor_view(methods):
+    """ view for secured requests
+        includes error handling from morriswa package"""
+    return __customized_view(
+        methods,
+        settings.DJANGO_VENDOR_PERMISSION_CLASSES,
+        settings.DJANGO_USER_AUTHENTICATION_CLASSES
+    )
 
 def admin_view(methods):
     """ view for secured requests

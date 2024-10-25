@@ -15,6 +15,10 @@ class UserView(APIView):
     permission_classes = settings.DJANGO_USER_PERMISSION_CLASSES
     authentication_classes = settings.DJANGO_USER_AUTHENTICATION_CLASSES
 
+class VendorView(APIView):
+    permission_classes = settings.DJANGO_VENDOR_PERMISSION_CLASSES
+    authentication_classes = settings.DJANGO_USER_AUTHENTICATION_CLASSES
+
 class AdminView(APIView):
     permission_classes = settings.DJANGO_ADMIN_PERMISSION_CLASSES
     authentication_classes = settings.DJANGO_USER_AUTHENTICATION_CLASSES
