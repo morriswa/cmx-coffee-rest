@@ -47,28 +47,24 @@ class VendorProductDetailsView(VendorView):
         return Response(status=200, data=product_details.json())
 
 
-class VendorProductImageView(VendorView):
-    @staticmethod
-    def get(request: Request, product_id: int) -> Response:
-        vendor_id: int = dao.get_vendor_id_associated_with_user(request.user.user_id)
-        keylist = s3client.list(f'cmx/coffee/public/product/{product_id}')
-        images = [s3client.get(key) for key in keylist]
-        return Response(status=200, data=images)
+@vendor_view(['POST'])
+def upload_product_image(request: Request, product_id: int) -> Response:
+    vendor_id: int = dao.get_vendor_id_associated_with_user(request.user.user_id)
+    dao.assert_vendor_owns_product(vendor_id, product_id)
 
-    @staticmethod
-    def post(request: Request, product_id: int) -> Response:
-        vendor_id: int = dao.get_vendor_id_associated_with_user(request.user.user_id)
-        image_id = uuid.uuid4()
-        key = f'cmx/coffee/public/product/{product_id}/{image_id}'
-        s3client.upload(
-            request.FILES.get('image_upload'),
-            key
-        )
-        return Response(status=200, data=key)
+    image_id = uuid.uuid4()
+    key = f'cmx/coffee/public/product/{product_id}/{image_id}'
+    s3client.upload(
+        request.FILES.get('image_upload'),
+        key
+    )
+    return Response(status=200, data=key)
 
 
 @vendor_view(['DELETE'])
 def delete_product_image(request: Request, product_id: int, image_id: str) -> Response:
     vendor_id: int = dao.get_vendor_id_associated_with_user(request.user.user_id)
+    dao.assert_vendor_owns_product(vendor_id, product_id)
+
     s3client.delete(f'cmx/coffee/public/product/{product_id}/{image_id}')
     return Response(status=204)

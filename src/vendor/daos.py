@@ -3,6 +3,7 @@
 """
 import logging
 from psycopg2 import errors
+from rest_framework import exceptions
 
 from app.connections import cursor
 from app.exceptions import BadRequestException
@@ -89,3 +90,14 @@ def get_product_details(vendor_id: int, product_id: int):
         if res is None:
             raise BadRequestException(f'could not find product #{product_id} with vendor {vendor_id}')
         return VendorProductResponse(**res)
+
+
+def assert_vendor_owns_product(vendor_id: int, product_id: int):
+    with cursor() as cur:
+        cur.execute(
+            "select 1 from vendor_product where vendor_id = %(vendor_id)s and product_id = %(product_id)s",
+            {'vendor_id': vendor_id, 'product_id': product_id}
+        )
+        res = cur.fetchone()
+        if res is None:
+            raise exceptions.PermissionDenied()
