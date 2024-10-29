@@ -3,12 +3,25 @@ import os
 from typing import Optional
 import boto3
 from botocore.exceptions import ClientError
+from botocore.config import Config
 
 
-__s3_client = boto3.client('s3')
+__s3_client = boto3.client(
+    "s3",
+    endpoint_url=f'https://s3.{os.getenv('AWS_S3_REGION')}.amazonaws.com',
+)
 __log = logging.getLogger(__name__)
 __s3_bucket = os.getenv('AWS_S3_BUCKET')
 
+
+def list(prefix):
+    objects = []
+    paginator = __s3_client.get_paginator('list_objects_v2')
+    for page in paginator.paginate(Bucket=__s3_bucket, Prefix=prefix):
+        if 'Contents' in page:
+            for obj in page['Contents']:
+                objects.append(obj['Key'])
+    return objects
 
 def upload(upload_file, key) -> None:
     try:

@@ -34,6 +34,8 @@ urlpatterns = [
     # vendor
     path('s/vendor/products', vendor_views.VendorProductView.as_view()),
     path('s/vendor/product/<int:product_id>', vendor_views.VendorProductDetailsView.as_view()),
+    path('s/vendor/product/<int:product_id>/image', vendor_views.VendorProductImageView.as_view()),
+    path('s/vendor/product/<int:product_id>/image/<str:image_id>', vendor_views.delete_product_image),
     # admin
     path('a/vendor-applications', admin_views.get_pending_vendor_applications),
     path('a/vendor-application/<int:application_id>', admin_views.process_pending_vendor_application),
