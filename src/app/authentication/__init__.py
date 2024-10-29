@@ -25,12 +25,12 @@ class UserAuthenticationWithJwt(BaseAuthentication):
             jwt_permissions:list = payload.get('permissions')
 
             email = get_email_decoded_jwt(payload)
-            user_id, db_permissions = get_user_info_from_db(email)
+            user_id, vendor_id = get_user_info_from_db(email)
 
-            all_permissions = jwt_permissions + db_permissions + settings.USER_PERMISSIONS
-
-            logging.info(f'successfully authenticated user {user_id} with email {email} and granted permissions {all_permissions}')
-            return User(email, user_id, all_permissions), payload
+            user = User(email, user_id, jwt_permissions, vendor_id)
+            logging.info(f'successfully authenticated user {user.user_id} '
+                         f'with email {user.email} and granted permissions {user.permissions}')
+            return user, payload
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('Token has expired.')
         except jwt.DecodeError:

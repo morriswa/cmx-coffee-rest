@@ -1,3 +1,4 @@
+import logging
 from typing import override
 
 from django.conf import settings
@@ -23,6 +24,10 @@ def WithPermissions(permissions):
     class HasPermission(BasePermission):
         @override
         def has_permission(self, request, view) -> bool:
-            return isinstance(request.user, User) and has_permissions(request.user.permissions, permissions)
+            allowed = isinstance(request.user, User) and has_permissions(request.user.permissions, permissions)
+            if not allowed:
+                logging.warn(f'SECURITY WARNING: user {request.user.user_id} with email {request.user.email} attempted to access an endpoint '
+                             f'that requires permissions: {permissions}... access denied')
+            return allowed
 
     return HasPermission

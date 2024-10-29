@@ -8,6 +8,7 @@ import jwt
 import logging
 import os
 import requests
+import uuid
 from functools import wraps
 from typing import override, Optional
 
@@ -17,6 +18,7 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 
 import app.connections
+from app.exceptions import BadRequestException
 
 
 def jwt_decode_token(token) -> dict:
@@ -84,9 +86,9 @@ def register_user_in_db(email:str):
         logging.info(f'successfully registered user {user_id} with email {email}')
         return user_id
 
-def get_user_info_from_db(email: str):
+def get_user_info_from_db(email: str) -> tuple[uuid, Optional[int]]:
     user_id = None
-    permissions = []
+    vendor_id = None
     with app.connections.cursor() as cursor:
         cursor.execute(
             "select user_id from auth_integration where email = %(email)s",
@@ -94,20 +96,21 @@ def get_user_info_from_db(email: str):
         )
         result = cursor.fetchone()
         if result is None:
-            logging.info(f'did not find database entry for user with email {email}')
-            return register_user_in_db(email), []
-        else:
-            user_id = result['user_id']
+            logging.info(f'did not find database entry for user with email {email}, attemping registration')
+            return register_user_in_db(email), None
+
+        user_id = result['user_id']
 
         cursor.execute(
-            "select 1 as result from vendor where user_id = %(user_id)s",
+            "select vendor_id from vendor where user_id = %(user_id)s",
             {'user_id': user_id}
         )
-        result = cursor.fetchone() or {'result': 0}
-        if result.get('result') == 1:
-            permissions.append('cmx_coffee:vendor')
+        result = cursor.fetchone()
+        if result is not None:
+            vendor_id = result['vendor_id']
 
-    return user_id, permissions
+    return user_id, vendor_id
+
 
 def jwt_has_scope(decoded_token, required_scopes: list[str]) -> bool:
     # retrieve scope string from token
