@@ -35,3 +35,11 @@ class VendorProductView(VendorView):
         product_listing = CreateProductRequest(**request.data)
         dao.list_product(vendor_id, user_id, product_listing)
         return Response(status=204)
+
+
+class VendorProductDetailsView(VendorView):
+    @staticmethod
+    def get(request: Request, product_id: int) -> Response:
+        vendor_id: int = dao.get_vendor_id_associated_with_user(request.user.user_id)
+        product_details = dao.get_product_details(vendor_id, product_id)
+        return Response(status=200, data=product_details.json())

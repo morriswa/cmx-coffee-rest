@@ -77,3 +77,15 @@ def get_products(vendor_id: int) -> list[VendorProductResponse]:
         )
         res = cur.fetchall()
         return [VendorProductResponse(**product) for product in res]
+
+
+def get_product_details(vendor_id: int, product_id: int):
+    with cursor() as cur:
+        cur.execute(
+            "select * from vendor_product where vendor_id = %(vendor_id)s and product_id = %(product_id)s",
+            {'vendor_id': vendor_id, 'product_id': product_id}
+        )
+        res = cur.fetchone()
+        if res is None:
+            raise BadRequestException(f'could not find product #{product_id} with vendor {vendor_id}')
+        return VendorProductResponse(**res)

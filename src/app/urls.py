@@ -29,11 +29,12 @@ urlpatterns = [
     path('permissions', core_views.permissions),
     # vendor application
     path('s/forms/vendor-application', vendor_views.apply_for_vendor),
+    # customer
+    path('s/profile', customer_views.get_customer_profile),
+    # vendor
+    path('s/vendor/products', vendor_views.VendorProductView.as_view()),
+    path('s/vendor/product/<int:product_id>', vendor_views.VendorProductDetailsView.as_view()),
     # admin
     path('a/vendor-applications', admin_views.get_pending_vendor_applications),
     path('a/vendor-application/<int:application_id>', admin_views.process_pending_vendor_application),
-    # customer
-    path('profile', customer_views.get_customer_profile),
-    # vendor
-    path('s/vendor/products', vendor_views.VendorProductView.as_view())
 ]
