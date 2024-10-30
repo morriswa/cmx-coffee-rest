@@ -1,0 +1,420 @@
+{
+	"info": {
+		"_postman_id": "97f51c54-cb0e-4a97-9942-b7846d1762ad",
+		"name": "cmx-coffee-rest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20723162"
+	},
+	"item": [
+		{
+			"name": "public",
+			"item": [
+				{
+					"name": "health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-path}}/health",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "secure",
+			"item": [
+				{
+					"name": "permissions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-path}}/permissions",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-path}}/register",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "vendor application",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"business_name\": \"Will's Coffee Palace\",\n    \"address_line_one\": \"1234 Fairy Tale St\",\n    \"city\": \"Make Believe\",\n    \"state\": \"IL\",\n    \"zip\": \"99999\",\n    \"country\": \"USA\",\n    \"business_email\": \"william@morriswa.org\",\n    \"phone\": \"9999999999\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-path}}/s/forms/vendor-application",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"s",
+								"forms",
+								"vendor-application"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "vendor",
+			"item": [
+				{
+					"name": "products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-path}}/s/vendor/products",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"s",
+								"vendor",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list  product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_name\": \"Espresso Roast\",\n    \"description\": \"our espresso roast...\",\n    \"initial_price\": 13.45\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-path}}/s/vendor/products",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"s",
+								"vendor",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image_upload",
+									"type": "file",
+									"src": "/Users/william/Pictures/Profile/_CEP6700.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-path}}/s/vendor/product/1/image",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"s",
+								"vendor",
+								"product",
+								"1",
+								"image"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete image",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base-path}}/s/vendor/product/:product_id/image/:image_id",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"s",
+								"vendor",
+								"product",
+								":product_id",
+								"image",
+								":image_id"
+							],
+							"variable": [
+								{
+									"key": "product_id",
+									"value": "1"
+								},
+								{
+									"key": "image_id",
+									"value": "cd8cbdd2-ddca-4df9-b3ae-a68a9d78f91e"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "vendor applications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-path}}/a/vendor-applications",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"a",
+								"vendor-applications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "process application",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base-path}}/a/vendor-application/:application-id?action=approve",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"a",
+								"vendor-application",
+								":application-id"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "approve"
+								}
+							],
+							"variable": [
+								{
+									"key": "application-id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "product",
+			"item": [
+				{
+					"name": "product images",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-path}}/s/product/:product_id/image",
+							"host": [
+								"{{base-path}}"
+							],
+							"path": [
+								"s",
+								"product",
+								":product_id",
+								"image"
+							],
+							"variable": [
+								{
+									"key": "product_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "tokenRequestParams",
+				"value": [
+					{
+						"key": "audience",
+						"value": "{{audience}}",
+						"enabled": true,
+						"send_as": "request_body"
+					}
+				],
+				"type": "any"
+			},
+			{
+				"key": "authRequestParams",
+				"value": [
+					{
+						"key": "audience",
+						"value": "{{audience}}",
+						"enabled": true,
+						"send_as": "request_url"
+					}
+				],
+				"type": "any"
+			},
+			{
+				"key": "scope",
+				"value": "{{scope}}",
+				"type": "string"
+			},
+			{
+				"key": "clientSecret",
+				"value": "{{client-secret}}",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "{{client-id}}",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "{{auth-url}}/oauth/token",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "{{auth-url}}/authorize",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "authorization_code_with_pkce",
+				"type": "string"
+			},
+			{
+				"key": "state",
+				"value": "123_state",
+				"type": "string"
+			},
+			{
+				"key": "useBrowser",
+				"value": true,
+				"type": "boolean"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
