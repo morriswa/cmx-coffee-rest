@@ -58,15 +58,6 @@ def get_token_auth_header(request):
 
     return token
 
-def get_email_decoded_jwt(payload):
-    """
-        gets email from decoded jwt
-    """
-    email = payload.get('email')
-    authenticate(remote_user=email)
-    return email
-
-
 def register_user_in_db(email:str):
     with app.connections.cursor() as cursor:
         cursor.execute(
