@@ -47,3 +47,8 @@ class ShoppingCartView(UserView):
         cart = dao.get_shopping_cart(request.user.user_id)
         # and return
         return Response(status=200, data=[item.json() for item in cart])
+
+    @staticmethod
+    def delete(request: Request) -> Response:
+        dao.reset_shopping_cart(request.user.user_id)
+        return Response(status=204)

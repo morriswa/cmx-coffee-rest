@@ -56,3 +56,7 @@ def update_shopping_cart(user_id: uuid, items: list[CartItem]) -> list[CartItem]
                     'product_id': item.product_id,
                     'quantity': item.quantity
                 })
+
+def reset_shopping_cart(user_id: uuid):
+    with connections.cursor() as cur:
+        cur.execute("delete from shopping_cart where user_id = %(user_id)s", {'user_id': user_id})
