@@ -50,6 +50,18 @@ class VendorProductDetailsView(VendorView):
         product_details = dao.get_product_details(vendor_id, product_id)
         return Response(status=200, data=product_details.json())
 
+    @staticmethod
+    def patch(requset: Request, product_id: int) -> Response:
+        # make sure vendor owns product
+
+        # build datamodel from request.data.get('coffee_bean_characteristics')
+
+        # pass datamodel to dao,
+        # update existing table data and create if there is none
+
+        # return 204 no content resposne
+        pass
+
 
 @vendor_view(['POST'])
 def upload_product_image(request: Request, product_id: int) -> Response:
