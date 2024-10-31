@@ -15,5 +15,8 @@ Scripts
 build/
 testdb
 
+### mac junk ###
+**/.DS_Store
+
 ### secrets ###
 secrets.properties
