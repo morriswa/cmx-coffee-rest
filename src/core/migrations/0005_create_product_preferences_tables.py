@@ -8,19 +8,20 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             sql="""
+                -- author: Timothy Holmes
                 create table product_characteristics(
                     product_id bigint primary key references vendor_product(product_id) on delete cascade,
                     cb_taste_strength char(1) check (cb_taste_strength ~ '[0-9]'),
-                    cb_decaf char(1) check (cb_decaf in ('Y', 'N')),
-                    cb_flavored char(1) check (cb_flavored in ('Y', 'N')),
-                    cb_single_origin char(1) check (cb_single_origin in ('Y', 'N')),
+                    cb_decaf char(1) check (cb_decaf in ('y', 'n')),
+                    cb_flavored char(1) check (cb_flavored in ('y', 'n')),
+                    cb_single_origin char(1) check (cb_single_origin in ('y', 'n')),
                     cb_regions varchar(100),
                     cb_keywords varchar(1000)
                 );
 
+                -- author: Rahul Bhattachan
                 create table customer_preferences(
-                   user_id UUID PRIMARY KEY REFERENCES auth_integration(user_id) 
-                        ON DELETE CASCADE,
+                    user_id UUID PRIMARY KEY REFERENCES auth_integration (user_id) ON DELETE CASCADE,
                     p_cb_strength_mild CHAR(1) CHECK (p_cb_strength_mild IN ('y', 'n')),
                     p_cb_strength_med CHAR(1) CHECK (p_cb_strength_med IN ('y', 'n')),
                     p_cb_strength_bold CHAR(1) CHECK (p_cb_strength_bold IN ('y', 'n')),
@@ -31,11 +32,6 @@ class Migration(migrations.Migration):
                     p_cb_origin_single CHAR(1) CHECK (p_cb_origin_single IN ('y', 'n')),
                     p_cb_origin_blend CHAR(1) CHECK (p_cb_origin_blend IN ('y', 'n')),
                     p_cb_keywords VARCHAR(1000)
-                
-                
-
-
-
                 );
             """,
             reverse_sql="""
