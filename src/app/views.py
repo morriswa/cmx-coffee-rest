@@ -6,8 +6,7 @@ from rest_framework.views import APIView
 
 
 class AnyView(APIView):
-    """ inherit this class to create a view for unsecured requests
-     includes error handling from morriswa package"""
+    """ inherit this class to create a view for unsecured requests """
     authentication_classes = []
     permission_classes = []
 

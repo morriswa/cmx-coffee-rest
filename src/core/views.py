@@ -1,14 +1,8 @@
-import json
-import logging
 
-from django.conf import settings
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from app.decorators import any_view, admin_view, user_view
-from app.views import AdminView
-from app.authentication import User
-
+from app.decorators import any_view, user_view
 
 
 @any_view(['GET'])

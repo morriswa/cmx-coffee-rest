@@ -7,7 +7,13 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 
 from .utils import *
-from .models import *
+from .models import User
+
+
+__all__ = [
+    "UserAuthenticationWithJwt",
+    "User",
+]
 
 
 class UserAuthenticationWithJwt(BaseAuthentication):
