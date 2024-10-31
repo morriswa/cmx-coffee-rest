@@ -32,6 +32,7 @@ urlpatterns = [
     path('s/forms/vendor-application', vendor_views.apply_for_vendor),
     # customer
     path('s/profile', customer_views.get_customer_profile),
+    path('s/profile/product-preferences', customer_views.update_customer_product_preferences),
     # product
     path('s/product/<int:product_id>/image', product_views.get_product_images),
     # vendor
