@@ -51,7 +51,7 @@ class VendorProductDetailsView(VendorView):
         return Response(status=200, data=product_details.json())
 
     @staticmethod
-    def patch(requset: Request, product_id: int) -> Response:
+    def patch(request: Request, product_id: int) -> Response:
         # make sure vendor owns product
 
         # build datamodel from request.data.get('coffee_bean_characteristics')
@@ -60,7 +60,12 @@ class VendorProductDetailsView(VendorView):
         # update existing table data and create if there is none
 
         # return 204 no content resposne
-        pass
+        vendor_id: int = request.user.vendor_id
+        dao.assert_vendor_owns_product(vendor_id, product_id)
+
+        dao.updated_existing_product(product_id, request.data)
+
+        return Response(status=204)
 
 
 @vendor_view(['POST'])
@@ -94,3 +99,4 @@ def delete_product_image(request: Request, product_id: int, image_id: str) -> Re
 
     s3client.delete(f'cmx/coffee/public/product/{product_id}/{image_id}')
     return Response(status=204)
+
