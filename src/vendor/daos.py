@@ -140,7 +140,6 @@ def updated_existing_product(product_id: int, request_data: dict):
             cur.execute("""
             UPDATE product_characteristics
             SET
-                product_id = COALESCE(%(product_id)s, product_id),
                 cb_taste_strength  = COALESCE(%(cb_taste_strength)s, cb_taste_strength),
                 cb_decaf = COALESCE(%(cb_decaf)s, cb_decaf),
                 cb_flavored =   COALESCE(%(cb_flavored)s, cb_flavored),
@@ -157,3 +156,4 @@ def updated_existing_product(product_id: int, request_data: dict):
             'cb_regions': request_data.get('coffee_bean_characteristics').get('regions'),
             'cb_keywords': request_data.get('coffee_bean_characteristics').get('keywords') 
             })  
+        
