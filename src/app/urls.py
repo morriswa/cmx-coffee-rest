@@ -37,6 +37,7 @@ urlpatterns = [
     path('s/shop/cart', customer_views.ShoppingCartView.as_view()),
     path('s/shop/products', product_views.get_products_for_sale),
     # product
+    path('s/product/<int:product_id>', product_views.get_product_details),
     path('s/product/<int:product_id>/image', product_views.get_product_images),
     # vendor
     path('s/vendor/products', vendor_views.VendorProductView.as_view()),
