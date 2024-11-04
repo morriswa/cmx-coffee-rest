@@ -8,7 +8,7 @@ from rest_framework import exceptions
 from app.connections import cursor
 from app.exceptions import BadRequestException, APIException
 
-from .models import VendorApplicationRequest, CreateProductRequest, VendorProductResponse
+from .models import VendorApplicationRequest, CreateProductRequest, VendorProductResponse, UpdateProductRequest
 
 
 def apply_for_vendor(user_id, vendor_application: VendorApplicationRequest):
@@ -164,59 +164,67 @@ def assert_vendor_owns_product(vendor_id: int, product_id: int):
         res = cur.fetchone()
         if res is None:
             raise exceptions.PermissionDenied()
-        
 
-def updated_existing_product(product_id: int, request_data: dict):
+
+def updated_existing_product(product_id: int, request: UpdateProductRequest):
     with cursor() as cur:
+        cur.execute("""
+            update vendor_product
+            set
+                product_name = coalesce(%(product_name)s, product_name),
+                description = coalesce(%(description)s, description),
+                initial_price = coalesce(%(initial_price)s, initial_price)
+            where product_id = %(product_id)s
+        """,{
+            'product_id': product_id,
+            'product_name': request.product_name,
+            'description': request.description,
+            'initial_price': request.initial_price,
+        })
+
         cur.execute(
             'SELECT * from product_characteristics WHERE product_id = %(product_id)s',
             {'product_id': product_id},
-                    
         )
-        
-        res = cur.fetchone(); 
+
+        res = cur.fetchone();
         if res is None:
             cur.execute("""
-            INSERT INTO product_characteristics
-            (product_id, cb_taste_strength, cb_decaf, cb_flavored, cb_single_origin, cb_regions, cb_keywords)
-            VALUES
-            (%(product_id)s, 
-            %(cb_taste_strength)s, 
-            %(cb_decaf)s, 
-            %(cb_flavored)s, 
-            %(cb_single_origin)s, 
-            %(cb_regions)s, 
-            %(bb_keywords)s)
-            """,
-            {
-            'product_id': product_id,
-            'cb_taste_strength': request_data.get('coffee_bean_characteristics').get('taste_strength'),
-            'cb_decaf': request_data.get('coffee_bean_characteristics').get('decaf'),
-            'cb_flavored': request_data.get('coffee_bean_characteristics').get('flavored'),
-            'cb_single_origin': request_data.get('coffee_bean_characteristics').get('single_origin'),
-            'cb_regions': request_data.get('coffee_bean_characteristics').get('regions'),
-            'bb_keywords': request_data.get('coffee_bean_characteristics').get('keywords')
-            }
-            )
+                INSERT INTO product_characteristics
+                   (product_id, cb_taste_strength,
+                    cb_decaf, cb_flavored, cb_single_origin,
+                    cb_regions, cb_keywords)
+                VALUES
+                   (%(product_id)s, %(cb_taste_strength)s,
+                    %(cb_decaf)s, %(cb_flavored)s, %(cb_single_origin)s,
+                    %(cb_regions)s, %(cb_keywords)s)
+            """,{
+                'product_id': product_id,
+                'cb_taste_strength': request.coffee_bean_characteristics.taste_strength,
+                'cb_decaf': request.coffee_bean_characteristics.decaf,
+                'cb_flavored': request.coffee_bean_characteristics.flavored,
+                'cb_single_origin': request.coffee_bean_characteristics.single_origin,
+                'cb_regions': request.coffee_bean_characteristics.regions,
+                'cb_keywords': request.coffee_bean_characteristics.keywords
+            })
 
         else:
             cur.execute("""
-            UPDATE product_characteristics
-            SET
-                cb_taste_strength  = COALESCE(%(cb_taste_strength)s, cb_taste_strength),
-                cb_decaf = COALESCE(%(cb_decaf)s, cb_decaf),
-                cb_flavored =   COALESCE(%(cb_flavored)s, cb_flavored),
-                cb_single_origin = COALESCE(%(cb_single_origin)s, cb_single_origin),
-                cb_regions = COALESCE(%(cb_regions)s, cb_regions),
-                cb_keywords = COALESCE(%(cb_keywords)s, cb_keywords)
-            WHERE product_id = %(product_id)s
-        """,{
-            'product_id': product_id,
-            'cb_taste_strength': request_data.get('coffee_bean_characteristics').get('taste_strength'),
-            'cb_decaf': request_data.get('coffee_bean_characteristics').get('decaf'),
-            'cb_flavored': request_data.get('coffee_bean_characteristics').get('flavored'),
-            'cb_single_origin': request_data.get('coffee_bean_characteristics').get('single_origin'),
-            'cb_regions': request_data.get('coffee_bean_characteristics').get('regions'),
-            'cb_keywords': request_data.get('coffee_bean_characteristics').get('keywords') 
-            })  
-        
+                UPDATE product_characteristics
+                SET
+                    cb_taste_strength  = COALESCE(%(cb_taste_strength)s, cb_taste_strength),
+                    cb_decaf = COALESCE(%(cb_decaf)s, cb_decaf),
+                    cb_flavored =   COALESCE(%(cb_flavored)s, cb_flavored),
+                    cb_single_origin = COALESCE(%(cb_single_origin)s, cb_single_origin),
+                    cb_regions = COALESCE(%(cb_regions)s, cb_regions),
+                    cb_keywords = COALESCE(%(cb_keywords)s, cb_keywords)
+                WHERE product_id = %(product_id)s
+            """,{
+                'product_id': product_id,
+                'cb_taste_strength': request.coffee_bean_characteristics.taste_strength,
+                'cb_decaf': request.coffee_bean_characteristics.decaf,
+                'cb_flavored': request.coffee_bean_characteristics.flavored,
+                'cb_single_origin': request.coffee_bean_characteristics.single_origin,
+                'cb_regions': request.coffee_bean_characteristics.regions,
+                'cb_keywords': request.coffee_bean_characteristics.keywords
+            })

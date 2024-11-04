@@ -12,7 +12,7 @@ from app.decorators import user_view, vendor_view
 from app import s3client
 from app.exceptions import BadRequestException
 
-from vendor.models import VendorApplicationRequest, CreateProductRequest
+from vendor.models import VendorApplicationRequest, CreateProductRequest, UpdateProductRequest
 import vendor.daos as dao
 
 
@@ -53,18 +53,14 @@ class VendorProductDetailsView(VendorView):
     @staticmethod
     def patch(request: Request, product_id: int) -> Response:
         # make sure vendor owns product
-
-        # build datamodel from request.data.get('coffee_bean_characteristics')
-
-        # pass datamodel to dao,
-        # update existing table data and create if there is none
-
-        # return 204 no content resposne
         vendor_id: int = request.user.vendor_id
         dao.assert_vendor_owns_product(vendor_id, product_id)
-
-        dao.updated_existing_product(product_id, request.data)
-
+        # build datamodel from request.data.get('coffee_bean_characteristics')
+        update_product_request = UpdateProductRequest(**request.data)
+        # pass datamodel to dao,
+        # update existing table data and create if there is none
+        dao.updated_existing_product(product_id, update_product_request)
+        # return 204 no content resposne
         return Response(status=204)
 
 
@@ -99,4 +95,3 @@ def delete_product_image(request: Request, product_id: int, image_id: str) -> Re
 
     s3client.delete(f'cmx/coffee/public/product/{product_id}/{image_id}')
     return Response(status=204)
-
