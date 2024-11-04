@@ -23,3 +23,6 @@ class CartItem(ValidatedDataModel):
 
         if len(excs) > 0:
             raise ValidationException(excs)
+        
+
+
