@@ -5,7 +5,7 @@ from app import connections
 from app.connections import cursor
 from app.exceptions import BadRequestException
 
-from .models import CartItem
+from .models import CartItem, CustomerPreferences
 
 
 def get_shopping_cart(user_id: uuid) -> list[CartItem]:
@@ -64,7 +64,7 @@ def reset_shopping_cart(user_id: uuid):
         cur.execute("delete from shopping_cart where user_id = %(user_id)s", {'user_id': user_id})
 
 
-def get_customer_preferences(user_id: uuid) -> dict:
+def get_customer_preferences(user_id: uuid) -> CustomerPreferences:
     with connections.cursor() as cur:
         cur.execute("""
             SELECT
@@ -84,23 +84,22 @@ def get_customer_preferences(user_id: uuid) -> dict:
 
         row = cur.fetchone()
         if row is not None:
-            return {
-                'p_cb_strength_mild': row[0],
-                'p_cb_strength_med': row[1],
-                'p_cb_strength_bold': row[2],
-                'p_cb_strength_blonde': row[3],
-                'p_cb_caf': row[4],
-                'p_cb_decaf': row[5],
-                'p_cb_flavored': row[6],
-                'p_cb_origin_single': row[7],
-                'p_cb_origin_blend': row[8],
-                'p_cb_keywords': row[9]
-            }
+            return CustomerPreferences(
+                strength_mild=row['p_cb_strength_mild'],
+                strength_med=row['p_cb_strength_med'],
+                strength_bold=row['p_cb_strength_bold'],
+                blonde=row['p_cb_strength_blonde'],
+                caffinated=row['p_cb_caf'],
+                decaf=row['p_cb_decaf'],
+                flavored=row['p_cb_flavored'],
+                single_origin=row['p_cb_origin_single'],
+                origin_blend=row['p_cb_origin_blend'],
+            )
         else:
             raise BadRequestException(f'could not locate customer preferences for user {user_id}')
 
 
-def update_customer_preferences(user_id: uuid, request_data: dict):
+def update_customer_preferences(user_id: uuid, request: CustomerPreferences):
     with cursor() as cur:
         cur.execute(
             'SELECT * FROM customer_preferences WHERE user_id = %(user_id)s',
@@ -115,25 +114,24 @@ def update_customer_preferences(user_id: uuid, request_data: dict):
                      p_cb_strength_mild, p_cb_strength_med,
                      p_cb_strength_bold, p_cb_strength_blonde,
                      p_cb_caf, p_cb_decaf, p_cb_flavored,
-                     p_cb_origin_single, p_cb_origin_blend, p_cb_keywords)
+                     p_cb_origin_single, p_cb_origin_blend)
                 VALUES
                     (%(user_id)s,
                     %(p_cb_strength_mild)s, %(p_cb_strength_med)s,
                     %(p_cb_strength_bold)s, %(p_cb_strength_blonde)s,
                     %(p_cb_caf)s, %(p_cb_decaf)s, %(p_cb_flavored)s,
-                    %(p_cb_origin_single)s, %(p_cb_origin_blend)s, %(p_cb_keywords)s)
+                    %(p_cb_origin_single)s, %(p_cb_origin_blend)s)
             """, {
                 'user_id': user_id,
-                'p_cb_strength_mild': request_data.get('strength_mild'),
-                'p_cb_strength_med': request_data.get('strength_medium'),
-                'p_cb_strength_bold': request_data.get('strength_bold'),
-                'p_cb_strength_blonde': request_data.get('strength_blonde'),
-                'p_cb_caf': request_data.get('caffeinated'),
-                'p_cb_decaf': request_data.get('decaffeinated'),
-                'p_cb_flavored': request_data.get('flavored'),
-                'p_cb_origin_single': request_data.get('origin_single'),
-                'p_cb_origin_blend': request_data.get('origin_blend'),
-                'p_cb_keywords': request_data.get('keywords')
+                'p_cb_strength_mild': request.strength_mild,
+                'p_cb_strength_med': request.strength_med,
+                'p_cb_strength_bold': request.strength_bold,
+                'p_cb_strength_blonde': request.blonde,
+                'p_cb_caf': request.caffinated,
+                'p_cb_decaf': request.decaf,
+                'p_cb_flavored': request.flavored,
+                'p_cb_origin_single': request.single_origin,
+                'p_cb_origin_blend': request.origin_blend,
             })
         else:
             cur.execute("""
@@ -152,14 +150,14 @@ def update_customer_preferences(user_id: uuid, request_data: dict):
                 WHERE user_id = %(user_id)s
             """, {
                 'user_id': user_id,
-                'p_cb_strength_mild': request_data.get('strength_mild'),
-                'p_cb_strength_med': request_data.get('strength_medium'),
-                'p_cb_strength_bold': request_data.get('strength_bold'),
-                'p_cb_strength_blonde': request_data.get('strength_blonde'),
-                'p_cb_caf': request_data.get('caffeinated'),
-                'p_cb_decaf': request_data.get('decaffeinated'),
-                'p_cb_flavored': request_data.get('flavored'),
-                'p_cb_origin_single': request_data.get('origin_single'),
-                'p_cb_origin_blend': request_data.get('origin_blend'),
-                'p_cb_keywords': request_data.get('keywords')
+                'p_cb_strength_mild': request.get('strength_mild'),
+                'p_cb_strength_med': request.get('strength_medium'),
+                'p_cb_strength_bold': request.get('strength_bold'),
+                'p_cb_strength_blonde': request.get('strength_blonde'),
+                'p_cb_caf': request.get('caffeinated'),
+                'p_cb_decaf': request.get('decaffeinated'),
+                'p_cb_flavored': request.get('flavored'),
+                'p_cb_origin_single': request.get('origin_single'),
+                'p_cb_origin_blend': request.get('origin_blend'),
+                'p_cb_keywords': request.get('keywords')
             })

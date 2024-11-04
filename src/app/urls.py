@@ -16,6 +16,7 @@ Including another URLconf
 """
 
 from django.urls import path
+from django.http import HttpResponse
 
 import core.views as core_views
 import customer.views as customer_views
@@ -24,6 +25,10 @@ import admin.views as admin_views
 import product.views as product_views
 
 
+# required to override django default 404
+handler404 = lambda *args, **kwargs: HttpResponse(status=404)
+
+# rest api paths
 urlpatterns = [
     # core app
     path('health', core_views.health),
@@ -33,7 +38,7 @@ urlpatterns = [
     path('s/forms/vendor-application', vendor_views.apply_for_vendor),
 
     # customer
-    path('s/profile/product-preferences', customer_views.CustomerPreferences.as_view()),
+    path('s/profile/product-preferences', customer_views.CustomerPreferencesView.as_view()),
 
     # shopping
     path('s/shop/cart', customer_views.ShoppingCartView.as_view()),

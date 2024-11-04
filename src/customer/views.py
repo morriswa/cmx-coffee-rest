@@ -7,23 +7,27 @@ from app.decorators import user_view
 from app.authentication import User
 from app.views import UserView
 
-from .models import CartItem
+from .models import CartItem, CustomerPreferences
 import customer.daos as dao
 
 
 
-class CustomerPreferences(UserView):
+class CustomerPreferencesView(UserView):
+
+    @staticmethod
     def get(request: Request) -> Response:
         user_id = request.user.user_id
         preferences = dao.get_customer_preferences(user_id)
         return Response(status=200, data=vars(preferences))
 
+    @staticmethod
     def patch(request: Request) -> Response:
-        user_id = request.user.user_id
-        preferences_data = request.data  # directly use the request data dictionary
+        # create the datamodel
+        preferences = CustomerPreferences(**request.data)  # directly use the request data dictionary
 
         # Call the DAO function to update customer preferences with the user ID and preferences data
-        dao.update_customer_preferences(user_id, preferences_data)
+        user_id = request.user.user_id
+        dao.update_customer_preferences(user_id, preferences)
 
         return Response(status=204)
 

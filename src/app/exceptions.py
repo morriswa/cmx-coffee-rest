@@ -69,7 +69,9 @@ def app_exception_handler(exc, context):
     if isinstance(exc, APIException):
         return exc.response()
 
-    if isinstance(exc, exceptions.AuthenticationFailed) or isinstance(exc, exceptions.PermissionDenied):
+    if (isinstance(exc, exceptions.AuthenticationFailed)
+        or isinstance(exc, exceptions.PermissionDenied)
+        or isinstance(exc, exceptions.NotFound)):
         return Response({"msg": exc.detail}, status=exc.status_code)
 
     # default case
