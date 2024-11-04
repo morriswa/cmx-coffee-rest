@@ -36,6 +36,8 @@ class VendorApplicationRequest(ValidatedDataModel):
 
         if self.state is None:
             validation_exceptions.append(('state','not null'))
+        elif len(self.state) != 2:
+            validation_exceptions.append(('state','MUST be 2 character state code'))
 
         if self.zip is None:
             validation_exceptions.append(('zip','not null'))
