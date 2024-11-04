@@ -33,8 +33,9 @@ APP_MODULES = [
     'admin',
     'core',
     'customer',
-    'vendor',
     'product',
+    'product_review',
+    'vendor',
 ]
 
 INSTALLED_APPS = [
