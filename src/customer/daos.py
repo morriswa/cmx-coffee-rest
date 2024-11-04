@@ -145,19 +145,17 @@ def update_customer_preferences(user_id: uuid, request: CustomerPreferences):
                     p_cb_decaf = COALESCE(%(p_cb_decaf)s, p_cb_decaf),
                     p_cb_flavored = COALESCE(%(p_cb_flavored)s, p_cb_flavored),
                     p_cb_origin_single = COALESCE(%(p_cb_origin_single)s, p_cb_origin_single),
-                    p_cb_origin_blend = COALESCE(%(p_cb_origin_blend)s, p_cb_origin_blend),
-                    p_cb_keywords = COALESCE(%(p_cb_keywords)s, p_cb_keywords)
+                    p_cb_origin_blend = COALESCE(%(p_cb_origin_blend)s, p_cb_origin_blend)
                 WHERE user_id = %(user_id)s
             """, {
                 'user_id': user_id,
-                'p_cb_strength_mild': request.get('strength_mild'),
-                'p_cb_strength_med': request.get('strength_medium'),
-                'p_cb_strength_bold': request.get('strength_bold'),
-                'p_cb_strength_blonde': request.get('strength_blonde'),
-                'p_cb_caf': request.get('caffeinated'),
-                'p_cb_decaf': request.get('decaffeinated'),
-                'p_cb_flavored': request.get('flavored'),
-                'p_cb_origin_single': request.get('origin_single'),
-                'p_cb_origin_blend': request.get('origin_blend'),
-                'p_cb_keywords': request.get('keywords')
+                'p_cb_strength_mild': request.strength_mild,
+                'p_cb_strength_med': request.strength_med,
+                'p_cb_strength_bold': request.strength_bold,
+                'p_cb_strength_blonde': request.blonde,
+                'p_cb_caf': request.caffinated,
+                'p_cb_decaf': request.decaf,
+                'p_cb_flavored': request.flavored,
+                'p_cb_origin_single': request.single_origin,
+                'p_cb_origin_blend': request.origin_blend,
             })
