@@ -11,21 +11,21 @@ from .models import CartItem
 import customer.daos as dao
 
 
-@user_view(['GET'])
-def get_customer_profile(request: Request) -> Response:
 
-    user: User = request.user
-    return Response(status=200, data=user.json())
+class CustomerPreferences(UserView):
+    def get(request: Request) -> Response:
+        user_id = request.user.user_id
+        preferences = dao.get_customer_preferences(user_id)
+        return Response(status=200, data=vars(preferences))
 
-@user_view(['PATCH'])
-def update_customer_product_preferences(request: Request) -> Response:
-    # build datamodel from request.data
+    def patch(request: Request) -> Response:
+        user_id = request.user.user_id
+        preferences_data = request.data  # directly use the request data dictionary
 
-    # pass datamodel to dao
-    # update existing database row, or create one
+        # Call the DAO function to update customer preferences with the user ID and preferences data
+        dao.update_customer_preferences(user_id, preferences_data)
 
-    # return 204 no content response
-    pass
+        return Response(status=204)
 
 
 class ShoppingCartView(UserView):

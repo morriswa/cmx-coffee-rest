@@ -18,3 +18,8 @@ def get_product_images(request: Request, product_id: int) -> Response:
 def get_products_for_sale(request: Request) -> Response:
     products = dao.get_products_for_sale(request.data)
     return Response(status=200, data=[product.json() for product in products])
+
+@user_view(['GET'])
+def get_product_details(request: Request, product_id: int) -> Response:
+    product = dao.get_product_details(product_id)
+    return Response(status=200, data=product.json())
