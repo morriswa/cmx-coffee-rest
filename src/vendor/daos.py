@@ -117,6 +117,7 @@ def get_products(vendor_id: int) -> list[VendorProductResponse]:
             left join product_characteristics pc
             on product.product_id = pc.product_id
             where   product.vendor_id = %(vendor_id)s
+            and     product.status = 'A'
         """,{'vendor_id': vendor_id})
         res = cur.fetchall()
         return [VendorProductResponse(**product) for product in res]
