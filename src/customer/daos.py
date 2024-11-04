@@ -3,6 +3,8 @@ import uuid
 
 from app import connections
 from app.connections import cursor
+from app.exceptions import BadRequestException
+
 from .models import CartItem
 
 
@@ -65,7 +67,7 @@ def reset_shopping_cart(user_id: uuid):
 def get_customer_preferences(user_id: uuid) -> dict:
     with connections.cursor() as cur:
         cur.execute("""
-            SELECT 
+            SELECT
                 p_cb_strength_mild,
                 p_cb_strength_med,
                 p_cb_strength_bold,
@@ -79,9 +81,9 @@ def get_customer_preferences(user_id: uuid) -> dict:
             FROM customer_preferences
             WHERE user_id = %(user_id)s
         """, {'user_id': user_id})
-        
+
         row = cur.fetchone()
-        if row:
+        if row is not None:
             return {
                 'p_cb_strength_mild': row[0],
                 'p_cb_strength_med': row[1],
@@ -95,7 +97,7 @@ def get_customer_preferences(user_id: uuid) -> dict:
                 'p_cb_keywords': row[9]
             }
         else:
-            return None
+            raise BadRequestException(f'could not locate customer preferences for user {user_id}')
 
 
 def update_customer_preferences(user_id: uuid, request_data: dict):
@@ -105,22 +107,21 @@ def update_customer_preferences(user_id: uuid, request_data: dict):
             {'user_id': user_id}
         )
         res = cur.fetchone()
-        
+
         if res is None:
             cur.execute("""
-                INSERT INTO customer_preferences 
-                (user_id, p_cb_strength_mild, p_cb_strength_med, p_cb_strength_bold, p_cb_strength_blonde, p_cb_caf, p_cb_decaf, p_cb_flavored, p_cb_origin_single, p_cb_origin_blend, p_cb_keywords)
-                VALUES 
-                (%(user_id)s, 
-                %(p_cb_strength_mild)s, 
-                %(p_cb_strength_med)s, 
-                %(p_cb_strength_bold)s, 
-                %(p_cb_strength_blonde)s, 
-                %(p_cb_caf)s, %(p_cb_decaf)s,
-                 %(p_cb_flavored)s, 
-                %(p_cb_origin_single)s, 
-                %(p_cb_origin_blend)s, 
-                %(p_cb_keywords)s)
+                INSERT INTO customer_preferences
+                    (user_id,
+                     p_cb_strength_mild, p_cb_strength_med,
+                     p_cb_strength_bold, p_cb_strength_blonde,
+                     p_cb_caf, p_cb_decaf, p_cb_flavored,
+                     p_cb_origin_single, p_cb_origin_blend, p_cb_keywords)
+                VALUES
+                    (%(user_id)s,
+                    %(p_cb_strength_mild)s, %(p_cb_strength_med)s,
+                    %(p_cb_strength_bold)s, %(p_cb_strength_blonde)s,
+                    %(p_cb_caf)s, %(p_cb_decaf)s, %(p_cb_flavored)s,
+                    %(p_cb_origin_single)s, %(p_cb_origin_blend)s, %(p_cb_keywords)s)
             """, {
                 'user_id': user_id,
                 'p_cb_strength_mild': request_data.get('strength_mild'),
