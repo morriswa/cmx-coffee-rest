@@ -6,7 +6,7 @@ from psycopg2 import errors
 from rest_framework import exceptions
 
 from app.connections import cursor
-from app.exceptions import BadRequestException
+from app.exceptions import BadRequestException, APIException
 
 from .models import VendorApplicationRequest, CreateProductRequest, VendorProductResponse
 
@@ -61,31 +61,94 @@ def list_product(vendor_id, user_id, product: CreateProductRequest):
             values
                (%(vendor_id)s, %(user_id)s, %(product_name)s,
                 %(description)s, %(initial_price)s)
+            returning product_id;
         """, {
             'vendor_id': vendor_id,
             'user_id': user_id,
             'product_name': product.product_name,
             'description': product.description,
             'initial_price': product.initial_price
-        })
+        });
+        res = cur.fetchone()
+        if res is None:
+            raise APIException('failed to retrieve newly created product ID')
+        product_id = res['product_id']
+
+        if product.coffee_bean_characteristics is not None:
+            cur.execute("""
+                insert into product_characteristics
+                    (product_id, cb_taste_strength, cb_decaf,
+                        cb_flavored, cb_single_origin,
+                        cb_regions, cb_keywords)
+                values
+                    (%(product_id)s, %(cb_taste_strength)s, %(cb_decaf)s,
+                        %(cb_flavored)s, %(cb_single_origin)s,
+                        %(cb_regions)s, %(cb_keywords)s);
+            """, {
+                'product_id': product_id,
+                'cb_taste_strength': product.coffee_bean_characteristics.taste_strength,
+                'cb_decaf': product.coffee_bean_characteristics.decaf,
+                'cb_flavored': product.coffee_bean_characteristics.flavored,
+                'cb_single_origin': product.coffee_bean_characteristics.single_origin,
+                'cb_regions': product.coffee_bean_characteristics.regions,
+                'cb_keywords': product.coffee_bean_characteristics.keywords
+            })
 
 
 def get_products(vendor_id: int) -> list[VendorProductResponse]:
     with cursor() as cur:
-        cur.execute(
-            "select * from vendor_product where vendor_id = %(vendor_id)s",
-            {'vendor_id': vendor_id}
-        )
+        cur.execute("""
+            select
+                product.product_id,
+                product.product_name,
+                product.description,
+                product.initial_price,
+                product.status,
+                product.date_created,
+                json_build_object(
+                    'taste_strength', pc.cb_taste_strength,
+                    'decaf', pc.cb_decaf,
+                    'flavored', pc.cb_flavored,
+                    'single_origin', pc.cb_single_origin,
+                    'regions', pc.cb_regions,
+                    'keywords', pc.cb_keywords
+                ) as coffee_bean_characteristics
+            from vendor_product product
+            left join product_characteristics pc
+            on product.product_id = pc.product_id
+            where   product.vendor_id = %(vendor_id)s
+        """,{'vendor_id': vendor_id})
         res = cur.fetchall()
         return [VendorProductResponse(**product) for product in res]
 
 
 def get_product_details(vendor_id: int, product_id: int):
     with cursor() as cur:
-        cur.execute(
-            "select * from vendor_product where vendor_id = %(vendor_id)s and product_id = %(product_id)s",
-            {'vendor_id': vendor_id, 'product_id': product_id}
-        )
+        cur.execute("""
+            select
+                product.product_id,
+                product.product_name,
+                product.description,
+                product.initial_price,
+                product.status,
+                product.date_created,
+                json_build_object(
+                    'taste_strength', pc.cb_taste_strength,
+                    'decaf', pc.cb_decaf,
+                    'flavored', pc.cb_flavored,
+                    'single_origin', pc.cb_single_origin,
+                    'regions', pc.cb_regions,
+                    'keywords', pc.cb_keywords
+                ) as coffee_bean_characteristics
+            from vendor_product product
+            left join product_characteristics pc
+            on product.product_id = pc.product_id
+            where   product.vendor_id = %(vendor_id)s
+            and     product.product_id = %(product_id)s
+        """,{
+            'vendor_id': vendor_id,
+            'product_id': product_id
+        })
         res = cur.fetchone()
         if res is None:
             raise BadRequestException(f'could not find product #{product_id} with vendor {vendor_id}')

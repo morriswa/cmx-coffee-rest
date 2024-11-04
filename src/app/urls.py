@@ -42,6 +42,7 @@ urlpatterns = [
     path('s/shop/products', product_views.get_products_for_sale),
     
     # product
+    path('s/product/<int:product_id>', product_views.get_product_details),
     path('s/product/<int:product_id>/image', product_views.get_product_images),
     
     # vendor
