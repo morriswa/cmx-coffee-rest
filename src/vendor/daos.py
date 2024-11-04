@@ -228,3 +228,11 @@ def updated_existing_product(product_id: int, request: UpdateProductRequest):
                 'cb_regions': request.coffee_bean_characteristics.regions,
                 'cb_keywords': request.coffee_bean_characteristics.keywords
             })
+
+def unlist_product(product_id):
+    """ NEEDS TO BE AUTHORIZED """
+    with cursor() as cur:
+        cur.execute(
+            "update vendor_product set status = 'U' where product_id = %(product_id)s",
+            {'product_id': product_id}
+        )

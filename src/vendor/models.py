@@ -94,10 +94,11 @@ class CoffeeBeanCharacteristics(ValidatedDataModel):
     def validate(self) -> None:
         excs = []
 
+        valid_taste_strength_values = [str(i) for i in range(10)]
         if self.taste_strength is not None and \
-            ['y', 'n'].count(self.taste_strength) != 1:
+            self.taste_strength not in valid_taste_strength_values:
             excs.append(('coffee_bean_characteristics.taste_strength',
-                         "valid values are ['y','n']"))
+                         f"valid values are {valid_taste_strength_values}"))
 
         if self.decaf is not None and \
             ['y', 'n'].count(self.decaf) != 1:
@@ -176,9 +177,6 @@ class UpdateProductRequest(VendorProduct):
     def validate(self) -> None:
 
         validation_errors = []
-
-        if self.product_id is None:
-            validation_errors.append(('product_id', 'should not be null'))
 
         if self.initial_price is not None:
             if self.initial_price <= 0:

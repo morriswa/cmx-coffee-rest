@@ -63,6 +63,16 @@ class VendorProductDetailsView(VendorView):
         # return 204 no content resposne
         return Response(status=204)
 
+    @staticmethod
+    def delete(request: Request, product_id: int) -> Response:
+        # make sure vendor owns product
+        vendor_id: int = request.user.vendor_id
+        dao.assert_vendor_owns_product(vendor_id, product_id)
+        # delete product
+        dao.unlist_product(product_id)
+        # return 204 no content resposne
+        return Response(status=204)
+
 
 @vendor_view(['POST'])
 def upload_product_image(request: Request, product_id: int) -> Response:
