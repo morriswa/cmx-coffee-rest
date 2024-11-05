@@ -18,12 +18,17 @@ def get_products_for_sale(filters = {}, limit = 10):
             product.product_name,
             product.description,
             product.initial_price,
+            pdetails.cb_taste_strength as taste_strength,
             pdetails.cb_decaf as decaf,
             pdetails.cb_flavored as flavored,
-            pdetails.cb_single_origin as single_origin
+            pdetails.cb_single_origin as single_origin,
+            v.vendor_id,
+            v.business_name
         from vendor_product product
-        left join product_characteristics pdetails
-        on product.product_id = pdetails.product_id
+            left join product_characteristics pdetails
+                on product.product_id = pdetails.product_id
+            left join vendor v
+                on product.vendor_id = v.vendor_id
         where product.status = 'A'
     """
     params = {'limit': limit}
