@@ -8,6 +8,7 @@ from app import connections
 from app.exceptions import BadRequestException
 
 from vendor.models import VendorApplicationResponse
+from admin.models import AdminVendorInfo
 
 
 def get_pending_vendor_applications() -> list[VendorApplicationResponse]:
@@ -47,3 +48,25 @@ def approve_vendor_application(user_id, application_id):
             "delete from vendor_applicant where application_id = %(application_id)s",
             {'application_id': application_id}
         )
+
+def reject_vendor_application(application_id):
+    with connections.cursor() as cur:
+        cur.execute("""
+            delete from vendor_applicant
+            where application_id = %(application_id)s
+        """,{
+            'application_id': application_id
+        })
+
+def get_all_vendors() -> list[AdminVendorInfo]:
+    with connections.cursor() as cur:
+        cur.execute("""
+            select
+                *,
+                usr.email as approver_email
+            from vendor ven
+            left join auth_integration usr
+            on ven.approved_by = usr.user_id
+        """)
+        res = cur.fetchall()
+        return [AdminVendorInfo(**data) for data in res]

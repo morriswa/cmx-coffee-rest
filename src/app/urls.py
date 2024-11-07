@@ -57,5 +57,5 @@ urlpatterns = [
     # admin
     path('a/vendor-applications', admin_views.get_pending_vendor_applications),
     path('a/vendor-application/<int:application_id>', admin_views.process_pending_vendor_application),
-
+    path('a/vendors', admin_views.get_all_vendors)
 ]

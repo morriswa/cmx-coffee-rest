@@ -24,7 +24,12 @@ def process_pending_vendor_application(request: Request, application_id: int) ->
             admin_dao.approve_vendor_application(request.user.user_id, application_id)
             return Response(status=204)
         case 'reject':
-            logging.info(f'implement me! reject app#{application_id}')
+            admin_dao.reject_vendor_application(application_id)
             return Response(status=204)
         case _:
             raise BadRequestException('invalid action')
+
+@admin_view(['GET'])
+def get_all_vendors(request: Request) -> Response:
+    vendors = admin_dao.get_all_vendors()
+    return Response(status=200, data=[vendor.json() for vendor in vendors])

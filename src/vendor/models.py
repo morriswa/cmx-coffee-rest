@@ -217,3 +217,21 @@ class VendorProductResponse(CreateProductRequest):
             **vars(self),
             'coffee_bean_characteristics': self.coffee_bean_characteristics.json()
         }
+
+class VendorInformation(ValidatedDataModel):
+    def __init__(self, **kwargs):
+        self.vendor_id = kwargs.get('vendor_id')
+        self.business_name = kwargs.get('business_name')
+        self.business_email = kwargs.get('business_email')
+        self.phone = kwargs.get('phone')
+        self.address_line_one = kwargs.get('address_line_one') or kwargs.get('address_one')
+        self.address_line_two = kwargs.get('address_line_two') or kwargs.get('address_two')
+        self.city = kwargs.get('city')
+        self.state = kwargs.get('state')
+        self.zip = kwargs.get('zip')
+        self.country = kwargs.get('country')
+        self.formatted_address = (  f"{self.address_line_one}, "
+                                    f"{self.address_line_two + ', ' if self.address_line_two is not None else ''}"
+                                    f"{self.city}, "
+                                    f"{self.state} {self.zip}, {self.country}")
+        self.join_date = kwargs.get('join_date') or kwargs.get('creation_date')
