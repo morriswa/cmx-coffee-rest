@@ -34,6 +34,11 @@ urlpatterns = [
     path('health', core_views.health),
     path('permissions', core_views.permissions),
 
+    # public product endpoints
+    path('product/<int:product_id>', product_views.get_product_details),
+    path('product/<int:product_id>/image', product_views.get_product_images),
+    path('shop/products', product_views.get_products_for_sale),
+
     # vendor application
     path('s/forms/vendor-application', vendor_views.apply_for_vendor),
 
@@ -42,11 +47,6 @@ urlpatterns = [
 
     # shopping
     path('s/shop/cart', customer_views.ShoppingCartView.as_view()),
-    path('s/shop/products', product_views.get_products_for_sale),
-
-    # product
-    path('s/product/<int:product_id>', product_views.get_product_details),
-    path('s/product/<int:product_id>/image', product_views.get_product_images),
 
     # vendor
     path('s/vendor/products', vendor_views.VendorProductView.as_view()),
@@ -55,7 +55,7 @@ urlpatterns = [
     path('s/vendor/product/<int:product_id>/image/<str:image_id>', vendor_views.delete_product_image),
 
     # admin
-    path('a/vendor-applications', admin_views.get_pending_vendor_applications),
-    path('a/vendor-application/<int:application_id>', admin_views.process_pending_vendor_application),
-    path('a/vendors', admin_views.get_all_vendors)
+    path('s/admin/vendor-applications', admin_views.get_pending_vendor_applications),
+    path('s/admin/vendor-application/<int:application_id>', admin_views.process_pending_vendor_application),
+    path('s/admin/vendors', admin_views.get_all_vendors)
 ]
