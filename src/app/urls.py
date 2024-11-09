@@ -18,11 +18,12 @@ Including another URLconf
 from django.urls import path
 from django.http import HttpResponse
 
+import admin.views as admin_views
 import core.views as core_views
 import customer.views as customer_views
-import vendor.views as vendor_views
-import admin.views as admin_views
+import payment.views as payment_views
 import product.views as product_views
+import vendor.views as vendor_views
 
 
 # required to override django default 404
@@ -44,6 +45,7 @@ urlpatterns = [
 
     # customer
     path('s/profile/product-preferences', customer_views.CustomerPreferencesView.as_view()),
+    path('s/payment', payment_views.PaymentView.as_view()),
 
     # shopping
     path('s/shop/cart', customer_views.ShoppingCartView.as_view()),
