@@ -21,3 +21,8 @@ class PaymentView(UserView):
         pm = CreateMockPaymentRequest(**request.data)
         dao.save_payment_method(request.user.user_id, pm)
         return Response(status=204)
+
+    @staticmethod
+    def delete(request: Request) -> Response:
+        dao.delete_payment_method(request.user.user_id, request.data.get('payment_id'))
+        return Response(status=204)
