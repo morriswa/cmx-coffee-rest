@@ -23,6 +23,7 @@ import customer.views as customer_views
 import vendor.views as vendor_views
 import admin.views as admin_views
 import product.views as product_views
+import product_review.views as product_review_views
 
 
 # required to override django default 404
@@ -41,6 +42,12 @@ urlpatterns = [
 
     # vendor application
     path('s/forms/vendor-application', vendor_views.apply_for_vendor),
+
+    # product review
+    path('s/product/<int:product_id>/reviews', product_views.get_product_details),
+    
+    #delete product reviews
+    path('s/product/review/<int:review_id>', product_review_views.delete_product_reviews),
 
     # customer
     path('s/profile/product-preferences', customer_views.CustomerPreferencesView.as_view()),
