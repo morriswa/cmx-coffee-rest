@@ -4,6 +4,7 @@
 from typing import override
 from app.validation import ValidatedDataModel,is_blank #Super class for all data models in the app
 from app.exceptions import ValidationException #Exception class for validation errors
+from product.models import BaseProduct
 
 class CreateProductReview(ValidatedDataModel):
     def __init__(self, **kwargs): #kwargs unordered dictionary keyword arguments
