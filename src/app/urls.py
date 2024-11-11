@@ -31,6 +31,7 @@ import vendor.views as vendor_views
 handler404 = lambda *args, **kwargs: HttpResponse(status=404)
 
 # rest api paths
+# 's/' prefix for endpoints requiring an authorization header
 urlpatterns = [
     # core app
     path('health', core_views.health),
@@ -41,21 +42,21 @@ urlpatterns = [
     path('product/<int:product_id>/image', product_views.get_product_images),
     path('product/<int:product_id>/reviews', review_views.get_product_reviews),
     path('product/<int:product_id>/review-stats', review_views.get_product_review_stats),
-    path('shop/products', product_views.get_products_for_sale),
+    path('products', product_views.get_products_for_sale),
 
     # vendor application
     path('s/forms/vendor-application', vendor_views.apply_for_vendor),
-
-    # product review
-    path('s/product/<int:product_id>/reviews', review_views.add_product_review),
-    path('s/product/<int:product_id>/review/<int:review_id>', review_views.delete_product_review),
 
     # customer
     path('s/profile/product-preferences', customer_views.CustomerPreferencesView.as_view()),
     path('s/payment', payment_views.PaymentView.as_view()),
 
+    # secure product review
+    path('s/product/<int:product_id>/reviews', review_views.add_product_review),
+    path('s/product/<int:product_id>/review/<int:review_id>', review_views.delete_product_review),
+
     # shopping
-    path('s/shop/cart', customer_views.ShoppingCartView.as_view()),
+    path('s/cart', customer_views.ShoppingCartView.as_view()),
 
     # vendor
     path('s/vendor/products', vendor_views.VendorProductView.as_view()),
