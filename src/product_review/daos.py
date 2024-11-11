@@ -2,17 +2,12 @@
     Product Review database functions go here
 """
 
-import logging
-import decimal
-
-from psycopg2 import errors
-
 from app import connections
 
-from product_review.models import ProductReview
-from product_review.models import ProductStats
+from product_review.models import ProductReview, ProductStats
 
-def get_product_reviews_stats(product_id: int):
+
+def get_product_review_stats(product_id: int):
     with connections.cursor() as cur:
         cur.execute("""
             SELECT
@@ -27,7 +22,7 @@ def get_product_reviews_stats(product_id: int):
         return ProductStats(**result)
 
 
-def delete_product_reviews(user_id, product_id: int, review_id: int):
+def delete_product_review(user_id, product_id: int, review_id: int):
     with connections.cursor() as cur:
         cur.execute("""
             DELETE FROM product_reviews
@@ -58,7 +53,6 @@ def save_product_review(user_id, product_id, review_data: ProductReview):
         cur.execute(query, params)
 
 
-
 def get_reviews_for_product(product_id: int):
     query = """
         SELECT review_id, user_id, product_id, review_text, review_score
@@ -71,12 +65,6 @@ def get_reviews_for_product(product_id: int):
         cur.execute(query, params)
         rows = cur.fetchall()
         for row in rows:
-            reviews.append(ProductReview(
-                review_id=row['review_id'],
-                user_id=row['user_id'],
-                product_id=row['product_id'],
-                review_text=row['review_text'],
-                review_score=row['review_score']
-            ))
+            reviews.append(ProductReview(**row))
 
     return reviews

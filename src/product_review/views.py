@@ -17,9 +17,12 @@ def get_product_reviews(request: Request, product_id: int) -> Response:
     reviews = dao.get_reviews_for_product(product_id)
 
     # Serialize reviews into a JSON-friendly format
-    review_data = [review.__dict__ for review in reviews]
+    return Response(status=200, data=[review.json() for review in reviews])
 
-    return Response(status=200, data=review_data)
+@any_view(['GET'])
+def get_product_review_stats(request: Request, product_id: int) -> Response:
+    review_stats = dao.get_product_review_stats(product_id)
+    return Response(status=200, data=review_stats.json())
 
 @user_view(['POST'])
 def add_product_review(request: Request, product_id: int) -> Response:
@@ -32,11 +35,7 @@ def add_product_review(request: Request, product_id: int) -> Response:
     return Response(status=204)  # No Content, indicating success
 
 @user_view(['DELETE'])
-def delete_product_reviews(request: Request, product_id: int, review_id: int) -> Response:
-    dao.delete_product_reviews(request.user.user_id, product_id, review_id)
+def delete_product_review(request: Request, product_id: int, review_id: int) -> Response:
+    dao.delete_product_review(request.user.user_id, product_id, review_id)
     return Response(status=204)
 
-@user_view(['GET'])
-def get_product_reviews_stats(request: Request, product_id: int) -> Response:
-    review_stats = dao.get_product_reviews_stats(product_id)
-    return Response(status=200, data=review_stats.json())

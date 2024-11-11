@@ -39,13 +39,17 @@ class ProductStats(ValidatedDataModel):
 class ProductReview(CreateProductReview):
     def __init__(self, **kwargs):
         self.review_id = kwargs.get("review_id")
-        self.validate()
 
         super().__init__(**kwargs)
-        super().validate()
+
+        self.validate()
+
 
     @override
     def validate(self) -> None:
+
+        super().validate()
+
         excs = []
         if self.review_id is None:
             excs.append(('review_id', 'cannot be null'))
