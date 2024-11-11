@@ -43,7 +43,7 @@ class ShoppingCartView(UserView):
     def patch(request: Request) -> Response:
         # create datamodel from json request
         items = [
-            CartItem(props.get('product_id'), props.get('quantity'))
+            (props.get('product_id'), props.get('quantity'))
             for props in request.data
         ]
         # update shopping cart

@@ -33,6 +33,7 @@ APP_MODULES = [
     'admin',
     'core',
     'customer',
+    'payment',
     'product',
     'product_review',
     'vendor',
