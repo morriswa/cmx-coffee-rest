@@ -39,16 +39,15 @@ urlpatterns = [
     # public product endpoints
     path('product/<int:product_id>', product_views.get_product_details),
     path('product/<int:product_id>/image', product_views.get_product_images),
+    path('product/<int:product_id>/reviews', review_views.get_product_reviews),
     path('shop/products', product_views.get_products_for_sale),
 
     # vendor application
     path('s/forms/vendor-application', vendor_views.apply_for_vendor),
 
     # product review
-    path('s/product/<int:product_id>/reviews', product_views.get_product_details),
-    
-    #delete product reviews
-    path('s/product/review/<int:review_id>', review_views.delete_product_reviews),
+    path('s/product/<int:product_id>/reviews', review_views.add_product_review),
+    path('s/product/<int:product_id>/review/<int:review_id>', review_views.delete_product_reviews),
 
     # customer
     path('s/profile/product-preferences', customer_views.CustomerPreferencesView.as_view()),
