@@ -18,12 +18,13 @@ Including another URLconf
 from django.urls import path
 from django.http import HttpResponse
 
+import admin.views as admin_views
 import core.views as core_views
 import customer.views as customer_views
-import vendor.views as vendor_views
-import admin.views as admin_views
+import payment.views as payment_views
 import product.views as product_views
-import product_review.views as product_review_views
+import product_review.views as review_views  # Import the views for product_reviews app
+import vendor.views as vendor_views
 
 
 # required to override django default 404
@@ -47,10 +48,11 @@ urlpatterns = [
     path('s/product/<int:product_id>/reviews', product_views.get_product_details),
     
     #delete product reviews
-    path('s/product/review/<int:review_id>', product_review_views.delete_product_reviews),
+    path('s/product/review/<int:review_id>', review_views.delete_product_reviews),
 
     # customer
     path('s/profile/product-preferences', customer_views.CustomerPreferencesView.as_view()),
+    path('s/payment', payment_views.PaymentView.as_view()),
 
     # shopping
     path('s/shop/cart', customer_views.ShoppingCartView.as_view()),
@@ -64,5 +66,9 @@ urlpatterns = [
     # admin
     path('s/admin/vendor-applications', admin_views.get_pending_vendor_applications),
     path('s/admin/vendor-application/<int:application_id>', admin_views.process_pending_vendor_application),
-    path('s/admin/vendors', admin_views.get_all_vendors)
+    path('s/admin/vendors', admin_views.get_all_vendors),
+
+    # product review endpoints
+    path('product/<int:product_id>/reviews', review_views.get_product_reviews, name='get_product_reviews'),
+    path('s/product/reviews', review_views.add_product_review, name='add_product_review'),
 ]

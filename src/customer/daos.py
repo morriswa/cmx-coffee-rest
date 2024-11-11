@@ -1,5 +1,6 @@
 import logging
 import uuid
+import decimal
 
 from app import connections
 from app.connections import cursor
@@ -12,15 +13,31 @@ def get_shopping_cart(user_id: uuid) -> list[CartItem]:
     with connections.cursor() as cur:  # open a database cursor
         # retrieve and return latest shopping cart entries
         cur.execute("""
-            select * from shopping_cart
-            where user_id = %(user_id)s
+            select
+                cart.product_id,
+                cart.quantity,
+                product.product_name,
+                product.description,
+                vendor.business_name vendor_name,
+                product.initial_price
+            from shopping_cart cart
+                left join vendor_product product
+                    on cart.product_id = product.product_id
+                left join vendor
+                    on vendor.vendor_id = product.vendor_id
+            where cart.user_id = %(user_id)s
         """, {
             'user_id': user_id
         })
         rows = cur.fetchall()
-        return [CartItem(row['product_id'], row['quantity']) for row in rows]
+        cart = []
+        for row in rows:
+            sale_price = decimal.Decimal(row['initial_price']) * decimal.Decimal('1.2')
+            sale_price = sale_price.quantize(decimal.Decimal('1.00'), rounding=decimal.ROUND_UP)
+            cart.append(CartItem(**row, sale_price=sale_price))
+        return cart
 
-def update_shopping_cart(user_id: uuid, items: list[CartItem]) -> list[CartItem]:
+def update_shopping_cart(user_id: uuid, items: list[tuple[int, int]]) -> list[CartItem]:
     with connections.cursor() as cur:   # open a database cursor
         for item in items:   # for every item in the cart...
             # check if the item is already present in the user's cart
@@ -31,7 +48,7 @@ def update_shopping_cart(user_id: uuid, items: list[CartItem]) -> list[CartItem]
                        and  product_id = %(product_id)s
             """,{
                 'user_id': user_id,
-                'product_id': item.product_id
+                'product_id': item[0]
             })
             res = cur.fetchone()
 
@@ -43,8 +60,8 @@ def update_shopping_cart(user_id: uuid, items: list[CartItem]) -> list[CartItem]
                         (%(user_id)s, %(product_id)s, %(quantity)s)
                 """, {
                     'user_id': user_id,
-                    'product_id': item.product_id,
-                    'quantity': item.quantity
+                    'product_id': item[0],
+                    'quantity': item[1]
                 })
             else:  # if product is in cart, modify with new quantity
                 cur.execute("""
@@ -55,8 +72,8 @@ def update_shopping_cart(user_id: uuid, items: list[CartItem]) -> list[CartItem]
                       and product_id = %(product_id)s
                 """, {
                     'user_id': user_id,
-                    'product_id': item.product_id,
-                    'quantity': item.quantity
+                    'product_id': item[0],
+                    'quantity': item[1]
                 })
 
 def reset_shopping_cart(user_id: uuid):

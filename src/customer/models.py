@@ -1,28 +1,38 @@
 
 from typing import override
+from decimal import Decimal
 
 from app.exceptions import ValidationException
 from app.validation import ValidatedDataModel
 
 
 class CartItem(ValidatedDataModel):
-    def __init__(self, product_id, quantity):
-        self.product_id = product_id
-        self.quantity = quantity
+    def __init__(self, **kwargs):
+        self.product_id = kwargs.get('product_id')
+        self.quantity = kwargs.get('quantity')
+        self.product_name = kwargs.get('product_name')
+        self.description = kwargs.get('description')
+        self.vendor_name = kwargs.get('vendor_name')
+        self.sale_price: Decimal = kwargs.get('sale_price')
 
         self.validate()
 
     @override
     def validate(self) -> None:
-        excs = []
         if self.product_id is None:
-            excs.append(('product_id', 'cannot be null'))
+            raise ValueError('product_id can never be none')
 
         if self.quantity is None:
-            excs.append(('quantity', 'cannot be null'))
+            raise ValueError('quantity can never be none')
 
-        if len(excs) > 0:
-            raise ValidationException(excs)
+        if self.product_name is None:
+            raise ValueError('product_name can never be none')
+
+        if self.vendor_name is None:
+            raise ValueError('vendor_name can never be none')
+
+        if self.sale_price is None:
+            raise ValueError('sale_price can never be none')
 
 
 class CustomerPreferences(ValidatedDataModel):
