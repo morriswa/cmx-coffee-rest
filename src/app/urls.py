@@ -66,8 +66,4 @@ urlpatterns = [
     path('s/admin/vendor-applications', admin_views.get_pending_vendor_applications),
     path('s/admin/vendor-application/<int:application_id>', admin_views.process_pending_vendor_application),
     path('s/admin/vendors', admin_views.get_all_vendors),
-
-    # product review endpoints
-    path('product/<int:product_id>/reviews', review_views.get_product_reviews, name='get_product_reviews'),
-    path('s/product/reviews', review_views.add_product_review, name='add_product_review'),
 ]
