@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from app import s3client
 from app.decorators import user_view, any_view
 
-import product.daos as dao
-from product.models import CreateProductReview, ProductReview
+import product_review.daos as dao
+from product_review.models import CreateProductReview, ProductReview
 
 
 @any_view(['GET'])
