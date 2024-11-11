@@ -61,7 +61,7 @@ urlpatterns = [
     # vendor
     path('s/vendor/products', vendor_views.VendorProductView.as_view()),
     path('s/vendor/product/<int:product_id>', vendor_views.VendorProductDetailsView.as_view()),
-    path('s/vendor/product/<int:product_id>/image', vendor_views.upload_product_image),
+    path('s/vendor/product/<int:product_id>/images', vendor_views.VendorProductImagesView.as_view()),
     path('s/vendor/product/<int:product_id>/image/<str:image_id>', vendor_views.delete_product_image),
 
     # admin

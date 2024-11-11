@@ -74,27 +74,37 @@ class VendorProductDetailsView(VendorView):
         return Response(status=204)
 
 
-@vendor_view(['POST'])
-def upload_product_image(request: Request, product_id: int) -> Response:
-    vendor_id: int = request.user.vendor_id
-    # assert logged in vendor has permission to modify product
-    dao.assert_vendor_owns_product(vendor_id, product_id)
+class VendorProductImagesView(VendorView):
 
-    # count images that belong to product
-    product_prefix = f'cmx/coffee/public/product/{product_id}'
-    image_count = len(s3client.list(product_prefix))
-    if image_count >= 10:  # and throw error if the max has been reached
-        raise BadRequestException('cannot have more than 10 images for a product, not uploading...')
+    @staticmethod
+    def get(request: Request, product_id: int) -> Response:
+        dao.assert_vendor_owns_product(request.user.vendor_id, product_id)
+        keylist: list[str] = s3client.list(f'cmx/coffee/public/product/{product_id}')
 
-    # generate uuid for image
-    image_id = uuid.uuid4()
-    s3client.upload(  # and upload
-        request.FILES.get('image_upload'),
-        f'{product_prefix}/{image_id}'
-    )
+        key_image_pairs = [{'id':key.split('/')[-1],'url': s3client.get(key)} for key in keylist]
+        return Response(status=200, data=key_image_pairs)
 
-    # return generated id
-    return Response(status=200, data=image_id)
+    @staticmethod
+    def post(request: Request, product_id: int) -> Response:
+        vendor_id: int = request.user.vendor_id
+        # assert logged in vendor has permission to modify product
+        dao.assert_vendor_owns_product(vendor_id, product_id)
+
+        # count images that belong to product
+        product_prefix = f'cmx/coffee/public/product/{product_id}'
+        image_count = len(s3client.list(product_prefix))
+        if image_count >= 10:  # and throw error if the max has been reached
+            raise BadRequestException('cannot have more than 10 images for a product, not uploading...')
+
+        # generate uuid for image
+        image_id = uuid.uuid4()
+        s3client.upload(  # and upload
+            request.FILES.get('image_upload'),
+            f'{product_prefix}/{image_id}'
+        )
+
+        # return generated id
+        return Response(status=200, data=image_id)
 
 
 @vendor_view(['DELETE'])
