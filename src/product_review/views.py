@@ -22,12 +22,12 @@ def get_product_reviews(request: Request, product_id: int) -> Response:
     return Response(status=200, data=review_data)
 
 @user_view(['POST'])
-def add_product_review(request: Request) -> Response:
+def add_product_review(request: Request, product_id: int) -> Response:
     # Validate and parse input data
     review_data = CreateProductReview(**request.data)
 
     # Call DAO function to save review in the database
-    dao.save_product_review(request.user.user_id, review_data)
+    dao.save_product_review(request.user.user_id, product_id, review_data)
 
     return Response(status=204)  # No Content, indicating success
 

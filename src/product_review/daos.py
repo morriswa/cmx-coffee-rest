@@ -26,7 +26,7 @@ def delete_product_reviews(user_id, product_id: int, review_id: int):
         })
 
 
-def save_product_review(user_id, review_data: ProductReview):
+def save_product_review(user_id, product_id, review_data: ProductReview):
     query = """
         INSERT INTO product_reviews
             (user_id, product_id, review_text, review_score)
@@ -35,7 +35,7 @@ def save_product_review(user_id, review_data: ProductReview):
     """
     params = {
         'user_id': user_id,
-        'product_id': review_data.product_id,
+        'product_id': product_id,
         'review_text': review_data.review_text,
         'review_score': review_data.review_score
     }
