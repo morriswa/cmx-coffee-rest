@@ -10,6 +10,183 @@
 			"name": "public",
 			"item": [
 				{
+					"name": "product",
+					"item": [
+						{
+							"name": "shop products",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-path}}/products",
+									"host": [
+										"{{base-path}}"
+									],
+									"path": [
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "product images",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-path}}/s/product/:product_id/image",
+									"host": [
+										"{{base-path}}"
+									],
+									"path": [
+										"s",
+										"product",
+										":product_id",
+										"image"
+									],
+									"query": [
+										{
+											"key": "whatever",
+											"value": "value",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "product_id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "product details",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-path}}/product/:product_id",
+									"host": [
+										"{{base-path}}"
+									],
+									"path": [
+										"product",
+										":product_id"
+									],
+									"variable": [
+										{
+											"key": "product_id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "product review stats",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-path}}/product/:product_id/review-stats",
+									"host": [
+										"{{base-path}}"
+									],
+									"path": [
+										"product",
+										":product_id",
+										"review-stats"
+									],
+									"variable": [
+										{
+											"key": "product_id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "product reviews",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"review_score\": \"4\",\n    \"review_text\": \"Slightly better than socks\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-path}}/product/:product_id/reviews",
+									"host": [
+										"{{base-path}}"
+									],
+									"path": [
+										"product",
+										":product_id",
+										"reviews"
+									],
+									"variable": [
+										{
+											"key": "product_id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "health",
 					"request": {
 						"method": "GET",
@@ -57,6 +234,561 @@
 			"name": "secure",
 			"item": [
 				{
+					"name": "vendor",
+					"item": [
+						{
+							"name": "product management",
+							"item": [
+								{
+									"name": "products",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base-path}}/s/vendor/products",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"vendor",
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "product details",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"product_name\": \"Decaf Roast\",\n    \"description\": \"our decaf roast...\",\n    \"initial_price\": 10.01\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/vendor/product/:product_id",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"vendor",
+												"product",
+												":product_id"
+											],
+											"variable": [
+												{
+													"key": "product_id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "list  product",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"product_name\": \"Ethiopian Roast\",\n    \"description\": \"our Ethiopian roast...\",\n    \"initial_price\": 14.36,\n    \"coffee_bean_characteristics\": {\n        \"taste_strength\": \"5\",\n        \"decaf\": \"n\",\n        \"single_origin\": \"y\",\n        \"flavored\": \"n\"\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/vendor/products",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"vendor",
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update product",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"coffee_bean_characteristics\": {\n        \"single_origin\": \"y\"\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/vendor/product/:product_id",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"vendor",
+												"product",
+												":product_id"
+											],
+											"variable": [
+												{
+													"key": "product_id",
+													"value": "6"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete product",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"product_name\": \"Decaf Roast\",\n    \"description\": \"our decaf roast...\",\n    \"initial_price\": 10.02,\n    \"coffee_bean_characteristics\": {\n        \"decaf\": \"y\"\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/vendor/product/3",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"vendor",
+												"product",
+												"3"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "upload image",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "image_upload",
+													"type": "file",
+													"src": "/Users/william/Pictures/Profile/_CEP6700.jpg"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base-path}}/s/vendor/product/1/image",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"vendor",
+												"product",
+												"1",
+												"image"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete image",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base-path}}/s/vendor/product/:product_id/image/:image_id",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"vendor",
+												"product",
+												":product_id",
+												"image",
+												":image_id"
+											],
+											"variable": [
+												{
+													"key": "product_id",
+													"value": "1"
+												},
+												{
+													"key": "image_id",
+													"value": "cd8cbdd2-ddca-4df9-b3ae-a68a9d78f91e"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "admin",
+					"item": [
+						{
+							"name": "vendor applications",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-path}}/a/vendor-applications",
+									"host": [
+										"{{base-path}}"
+									],
+									"path": [
+										"a",
+										"vendor-applications"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "process application",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{base-path}}/a/vendor-application/:application-id?action=approve",
+									"host": [
+										"{{base-path}}"
+									],
+									"path": [
+										"a",
+										"vendor-application",
+										":application-id"
+									],
+									"query": [
+										{
+											"key": "action",
+											"value": "approve"
+										}
+									],
+									"variable": [
+										{
+											"key": "application-id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "customer",
+					"item": [
+						{
+							"name": "shop",
+							"item": [
+								{
+									"name": "shopping cart",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "[\n    {\n        \"product_id\": 3,\n        \"quantity\": 3\n    }\n]",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/shop/cart",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"shop",
+												"cart"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "shopping cart",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "[\n    {\n        \"product_id\": 7,\n        \"quantity\": 2\n    },\n    {\n        \"product_id\": 4,\n        \"quantity\": 1\n    }\n]",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/shop/cart",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"shop",
+												"cart"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "clear cart",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "[\n    {\n        \"product_id\": 3,\n        \"quantity\": 3\n    }\n]",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/shop/cart",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"shop",
+												"cart"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "payment",
+							"item": [
+								{
+									"name": "pay methods",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base-path}}/s/payment",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"payment"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "more methods",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"nickname\": \"My Debit Card\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/payment",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"payment"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "preferences",
+							"item": [
+								{
+									"name": "preferences",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base-path}}/s/profile/product-preferences",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"profile",
+												"product-preferences"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update preferences",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"decaf\": \"y\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/profile/product-preferences",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"profile",
+												"product-preferences"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "reviews",
+							"item": [
+								{
+									"name": "leave review",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"review_score\": 5,\n    \"review_text\": \"Stunning and Brave\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/product/:product_id/reviews",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"product",
+												":product_id",
+												"reviews"
+											],
+											"variable": [
+												{
+													"key": "product_id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete review",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"review_score\": \"4\",\n    \"review_text\": \"Slightly better than socks\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base-path}}/s/product/:product_id/review/:review_id",
+											"host": [
+												"{{base-path}}"
+											],
+											"path": [
+												"s",
+												"product",
+												":product_id",
+												"review",
+												":review_id"
+											],
+											"variable": [
+												{
+													"key": "product_id",
+													"value": "1"
+												},
+												{
+													"key": "review_id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
 					"name": "permissions",
 					"request": {
 						"method": "GET",
@@ -68,23 +800,6 @@
 							],
 							"path": [
 								"permissions"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "register",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base-path}}/register",
-							"host": [
-								"{{base-path}}"
-							],
-							"path": [
-								"register"
 							]
 						}
 					},
@@ -113,206 +828,6 @@
 								"s",
 								"forms",
 								"vendor-application"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "vendor",
-			"item": [
-				{
-					"name": "products",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base-path}}/s/vendor/products",
-							"host": [
-								"{{base-path}}"
-							],
-							"path": [
-								"s",
-								"vendor",
-								"products"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "list  product",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"product_name\": \"Espresso Roast\",\n    \"description\": \"our espresso roast...\",\n    \"initial_price\": 13.45\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base-path}}/s/vendor/products",
-							"host": [
-								"{{base-path}}"
-							],
-							"path": [
-								"s",
-								"vendor",
-								"products"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "upload image",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "image_upload",
-									"type": "file",
-									"src": "/Users/william/Pictures/Profile/_CEP6700.jpg"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{base-path}}/s/vendor/product/1/image",
-							"host": [
-								"{{base-path}}"
-							],
-							"path": [
-								"s",
-								"vendor",
-								"product",
-								"1",
-								"image"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete image",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base-path}}/s/vendor/product/:product_id/image/:image_id",
-							"host": [
-								"{{base-path}}"
-							],
-							"path": [
-								"s",
-								"vendor",
-								"product",
-								":product_id",
-								"image",
-								":image_id"
-							],
-							"variable": [
-								{
-									"key": "product_id",
-									"value": "1"
-								},
-								{
-									"key": "image_id",
-									"value": "cd8cbdd2-ddca-4df9-b3ae-a68a9d78f91e"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "admin",
-			"item": [
-				{
-					"name": "vendor applications",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base-path}}/a/vendor-applications",
-							"host": [
-								"{{base-path}}"
-							],
-							"path": [
-								"a",
-								"vendor-applications"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "process application",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"url": {
-							"raw": "{{base-path}}/a/vendor-application/:application-id?action=approve",
-							"host": [
-								"{{base-path}}"
-							],
-							"path": [
-								"a",
-								"vendor-application",
-								":application-id"
-							],
-							"query": [
-								{
-									"key": "action",
-									"value": "approve"
-								}
-							],
-							"variable": [
-								{
-									"key": "application-id",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "product",
-			"item": [
-				{
-					"name": "product images",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base-path}}/s/product/:product_id/image",
-							"host": [
-								"{{base-path}}"
-							],
-							"path": [
-								"s",
-								"product",
-								":product_id",
-								"image"
-							],
-							"variable": [
-								{
-									"key": "product_id",
-									"value": "1"
-								}
 							]
 						}
 					},
