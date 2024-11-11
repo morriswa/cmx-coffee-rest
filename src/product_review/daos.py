@@ -15,7 +15,7 @@ from product_review.models import ProductReview
 def delete_product_reviews(user_id, product_id: int, review_id: int):
     with connections.cursor() as cur:
         cur.execute("""
-            DELETE FROM product_review
+            DELETE FROM product_reviews
             WHERE   review_id = %(review_id)s
             AND     product_id = %(product_id)s
             AND     user_id = %(user_id)s
