@@ -40,6 +40,7 @@ urlpatterns = [
     path('product/<int:product_id>', product_views.get_product_details),
     path('product/<int:product_id>/image', product_views.get_product_images),
     path('product/<int:product_id>/reviews', review_views.get_product_reviews),
+    path('product/<int:product_id>/review-stats', review_views.get_product_reviews_stats),
     path('shop/products', product_views.get_products_for_sale),
 
     # vendor application
@@ -48,7 +49,6 @@ urlpatterns = [
     # product review
     path('s/product/<int:product_id>/reviews', review_views.add_product_review),
     path('s/product/<int:product_id>/review/<int:review_id>', review_views.delete_product_reviews),
-    path('product/<int:product_id>/reviews-stats',review_views.get_product_reviews_stats),
 
     # customer
     path('s/profile/product-preferences', customer_views.CustomerPreferencesView.as_view()),

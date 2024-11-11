@@ -27,15 +27,12 @@ class CreateProductReview(ValidatedDataModel):
 
 class ProductStats(ValidatedDataModel):
     def __init__(self, **kwargs):#unordered dictionary key word arguements
-        self.avaerage_review_score = kwargs.get("average_review_score")
+        self.average_review_score = kwargs.get("average_review_score")
         self.review_count = kwargs.get("review_count")
         self.validate()
 
     @override
     def validate(self) -> None:
-        if self.average_review_score is None:
-            raise ValueError("Average Review Score should never be none")
-
         if self.review_count is None:
              raise ValueError("Review Count should never be none")
 

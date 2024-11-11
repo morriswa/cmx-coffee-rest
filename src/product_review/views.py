@@ -39,4 +39,4 @@ def delete_product_reviews(request: Request, product_id: int, review_id: int) ->
 @user_view(['GET'])
 def get_product_reviews_stats(request: Request, product_id: int) -> Response:
     review_stats = dao.get_product_reviews_stats(product_id)
-    return Response(status=200, data=review_stats)
+    return Response(status=200, data=review_stats.json())
