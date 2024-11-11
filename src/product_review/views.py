@@ -27,11 +27,11 @@ def add_product_review(request: Request) -> Response:
     review_data = CreateProductReview(**request.data)
 
     # Call DAO function to save review in the database
-    dao.save_product_review(review_data)
+    dao.save_product_review(request.user.user_id, review_data)
 
     return Response(status=204)  # No Content, indicating success
 
 @user_view(['DELETE'])
-def delete_product_reviews(request: Request, review_id: int) -> Response:
-    dao.delete_product_reviews(review_id)
+def delete_product_reviews(request: Request, product_id: int, review_id: int) -> Response:
+    dao.delete_product_reviews(request.user.user_id, product_id, review_id)
     return Response(status=204)

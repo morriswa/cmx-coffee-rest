@@ -9,22 +9,24 @@ from psycopg2 import errors
 
 from app import connections
 
-from .models import BaseProduct
+from product_review.models import ProductReview
 
-def delete_user_product_reviews(review_id: int):
+
+def delete_product_reviews(user_id, product_id: int, review_id: int):
     with connections.cursor() as cur:
         cur.execute("""
-        DELETE FROM product_review 
-        WHERE review_id = %(review_id)s
-        """), {'review_id': review_id}
-import logging
+            DELETE FROM product_review
+            WHERE   review_id = %(review_id)s
+            AND     product_id = %(product_id)s
+            AND     user_id = %(user_id)s
+        """, {
+            'review_id': review_id,
+            'product_id': product_id,
+            'user_id': user_id
+        })
 
-from app import connections
 
-from .models import ProductReview
-
-
-def save_product_review(review_data: ProductReview):
+def save_product_review(user_id, review_data: ProductReview):
     query = """
         INSERT INTO product_reviews
             (user_id, product_id, review_text, review_score)
@@ -32,7 +34,7 @@ def save_product_review(review_data: ProductReview):
             (%(user_id)s, %(product_id)s, %(review_text)s, %(review_score)s)
     """
     params = {
-        'user_id': review_data.user_id,
+        'user_id': user_id,
         'product_id': review_data.product_id,
         'review_text': review_data.review_text,
         'review_score': review_data.review_score
