@@ -48,6 +48,7 @@ urlpatterns = [
     # product review
     path('s/product/<int:product_id>/reviews', review_views.add_product_review),
     path('s/product/<int:product_id>/review/<int:review_id>', review_views.delete_product_reviews),
+    path('product/<int:product_id>/reviews-stats',review_views.get_product_reviews_stats),
 
     # customer
     path('s/profile/product-preferences', customer_views.CustomerPreferencesView.as_view()),

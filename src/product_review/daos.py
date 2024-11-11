@@ -10,7 +10,27 @@ from psycopg2 import errors
 from app import connections
 
 from product_review.models import ProductReview
+from product_review.models import ProductStats
 
+def get_product_reviews_stats(product_id: int):
+    with connections.cursor() as cur: 
+        cur.execute("""
+                    SELECT COUNT(review_id) review_count, AVG(review_score) AS average_review_score
+                    FROM product_reviews 
+                    WHERE product_id = %(product_id)s
+                    """,
+                    {
+                        'product_id': product_id
+                    }
+        )
+        result = cur.fetchone()
+        count = result['review_count']
+        average_score = result['average_review_score']
+        return count, average_score
+        
+
+        return count
+    
 
 def delete_product_reviews(user_id, product_id: int, review_id: int):
     with connections.cursor() as cur:
