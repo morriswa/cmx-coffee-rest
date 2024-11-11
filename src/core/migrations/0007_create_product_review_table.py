@@ -13,10 +13,10 @@ class Migration(migrations.Migration):
                 -- author: Rahul Bhattachan
                 CREATE TABLE product_reviews (
                     review_id BIGSERIAL PRIMARY KEY,
-                    user_id UUID NOT NULL REFERENCES auth_integration(user_id) ON DELETE CASCADE,
+                    user_id UUID NOT NULL REFERENCES auth_integration(user_id),
                     product_id BIGINT NOT NULL REFERENCES vendor_product(product_id) ON DELETE CASCADE,
                     review_text VARCHAR(10000) NOT NULL,
-                    review_score SMALLINT CHECK (review_score >= 1 AND review_score <= 5) NOT NULL
+                    review_score SMALLINT NOT NULL CHECK (review_score >= 1 AND review_score <= 5)
                 );
             """,
             reverse_sql="""

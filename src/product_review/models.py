@@ -25,12 +25,12 @@ class CreateProductReview(ValidatedDataModel):
         if is_blank(self.review_text):
             excs.append(('review_text','cannot be null or empty'))
 
-        if 1 <= self.review_score <= 5: 
+        if 1 <= self.review_score <= 5:
             excs.append(('review_score', 'cannot be less than 1 or greater than 5'))
 
         if len(excs) > 0:
             raise ValidationException(excs)
-        
+
 class ProductStats(ValidatedDataModel):
     def __init__(self, **kwargs):#unordered dictionary key word arguements
         self.avaerage_review_score = kwargs.get("average_review_score")
@@ -44,13 +44,14 @@ class ProductStats(ValidatedDataModel):
 
         if self.review_count is None:
              raise ValueError("Review Count should never be none")
-        
+
 class ProductReview(CreateProductReview):
     def __init__(self, **kwargs):
         self.review_id = kwargs.get("review_id")
         self.validate()
 
         super().__init__(**kwargs)
+        super().validate()
 
     @override
     def validate(self) -> None:
@@ -60,10 +61,3 @@ class ProductReview(CreateProductReview):
 
         if len(excs) > 0:
             raise ValidationException(excs)
-
-
-
-
-
-
-    

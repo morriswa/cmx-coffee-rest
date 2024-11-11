@@ -4,7 +4,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [('core', '0006_create_shopping_cart_table')]
+    dependencies = [('core', '0007_create_product_review_table')]
 
     operations = [
         migrations.RunSQL(
