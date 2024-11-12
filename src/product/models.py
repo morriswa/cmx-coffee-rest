@@ -20,6 +20,8 @@ class BaseProduct(ValidatedDataModel):
         self.flavored = kwargs.get('flavored')
         self.single_origin = kwargs.get('single_origin')
 
+        self.first_image = kwargs.get('first_image')
+
     @override
     def validate(self) -> None:
         if self.product_id is None:
