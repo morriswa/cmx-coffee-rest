@@ -52,6 +52,7 @@ urlpatterns = [
     # customer
     path('s/profile/product-preferences', customer_views.CustomerPreferencesView.as_view()),
     path('s/payment', payment_views.PaymentView.as_view()),
+    path('s/orders', order_views.get_orders),
 
     # secure product review
     path('s/product/<int:product_id>/reviews', review_views.add_product_review),

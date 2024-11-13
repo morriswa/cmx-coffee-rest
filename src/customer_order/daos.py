@@ -86,7 +86,7 @@ def review_order(user_id, order_id) -> Order:
                     on items.product_id = pd.product_id
                 left join vendor v
                     on pd.vendor_id = v.vendor_id
-            where odr.user_id = %(user_id)s and odr.order_id = %(order_id)s and odr = 'incompl'
+            where odr.user_id = %(user_id)s and odr.order_id = %(order_id)s and odr.status = 'incompl'
         """, {
             'user_id':user_id,
             'order_id':order_id,
@@ -124,6 +124,7 @@ def delete_order_draft(user_id, order_id):
             'user_id': user_id,
             'order_id': order_id
         })
+        res = cur.fetchone()
         if res is None:
             raise BadRequestException('no such order')
         order_status = res['status']
@@ -131,10 +132,77 @@ def delete_order_draft(user_id, order_id):
             raise exceptions.PermissionDenied('cannot delete submitted orders')
         else:
             cur.execute("""
-                       delete from mock_order
-                       where user_id = %(user_id)s
-                       and order_id = %(order_id)s
-                   """, {
+                delete from mock_order_item
+                where order_id = %(order_id)s
+            """, {'order_id': order_id})
+            cur.execute("""
+                delete from mock_order
+                where user_id = %(user_id)s
+                and order_id = %(order_id)s
+            """, {
                 'user_id': user_id,
                 'order_id': order_id
             })
+
+def submit_order(user_id, order_id, payment_id):
+    with connections.cursor() as cur:
+        cur.execute("""
+            update mock_order
+            set
+                payment_id = %(payment_id)s,
+                payment_status = 'paid',
+                status = 'shipped'
+            where user_id = %(user_id)s and order_id = %(order_id)s
+        """, {
+            'payment_id': payment_id,
+            'user_id': user_id,
+            'order_id': order_id
+        })
+
+def get_customer_orders(user_id):
+    with connections.cursor() as cur:
+        cur.execute("""
+            select
+                odr.order_id,
+                odr.payment_id,
+                odr.payment_status,
+                odr.status,
+                odr.subtotal,
+                odr.tax_rate,
+                odr.tax,
+                odr.total
+            from mock_order odr
+            where   odr.user_id = %(user_id)s
+            and     odr.status in ('shipped', 'process')
+        """, {'user_id': user_id,})
+        res = cur.fetchall()
+        orders = [Order(**data) for data in res]
+        orders_with_items = []
+        for order in orders:
+            cur.execute("""
+                select
+                    items.product_id,
+                    pd.product_name,
+
+                    items.quantity,
+                    items.each_price,
+
+                    pd.vendor_id,
+                    v.business_name
+                from mock_order_item items
+                    left join mock_order odr
+                        on items.order_id = odr.order_id
+                    left join vendor_product pd
+                        on items.product_id = pd.product_id
+                    left join vendor v
+                        on pd.vendor_id = v.vendor_id
+                where   odr.user_id = %(user_id)s
+                and     odr.order_id = %(order_id)s
+               """, {
+                'user_id': user_id,
+                'order_id': order.order_id
+            })
+            items = [OrderItem(**data) for data in cur.fetchall()]
+            order.items = items
+            orders_with_items.append(order)
+        return orders_with_items
