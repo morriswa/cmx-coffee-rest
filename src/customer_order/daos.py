@@ -27,7 +27,6 @@ def collect_shopping_cart(user_id) -> list[CreateOrderItem]:
 def create_order(user_id, orders):
     with connections.cursor() as cur:
         subtotal = sum([item.each_price for item in orders])
-        print(subtotal)
         cur.execute("""
             -- TODO add tax rate
             insert into mock_order
@@ -94,7 +93,6 @@ def review_order(user_id, order_id) -> Order:
             'order_id':order_id,
         })
         items = [OrderItem(**data) for data in cur.fetchall()]
-        print(items)
         cur.execute("""
             select
                 odr.order_id,
