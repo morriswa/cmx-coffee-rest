@@ -86,8 +86,7 @@ def review_order(user_id, order_id) -> Order:
                     on items.product_id = pd.product_id
                 left join vendor v
                     on pd.vendor_id = v.vendor_id
-            where odr.user_id = %(user_id)s and odr.order_id = %(order_id)s
-
+            where odr.user_id = %(user_id)s and odr.order_id = %(order_id)s and odr = 'incompl'
         """, {
             'user_id':user_id,
             'order_id':order_id,
