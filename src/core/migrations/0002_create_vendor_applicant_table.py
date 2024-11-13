@@ -9,17 +9,17 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             sql="""
                 create table vendor_approved_territory(
-                    territory_id bigserial primary key ,
+                    territory_id varchar(10) primary key ,
                     state_code char(2) not null unique ,
                     country_code char(3) not null ,
                     display_name varchar(32) not null unique
                 );
 
-                insert into vendor_approved_territory(state_code, country_code, display_name)
+                insert into vendor_approved_territory(territory_id, state_code, country_code, display_name)
                 values
-                    ('KS','USA','Kansas, USA'),
-                    ('MO','USA','Missouri, USA'),
-                    ('OK','USA','Oklahoma, USA')
+                    ('USA_KS','KS','USA','Kansas, USA'),
+                    ('USA_MO','MO','USA','Missouri, USA'),
+                    ('USA_OK','OK','USA','Oklahoma, USA')
                 ;
 
                 create table vendor_applicant(
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                     address_two varchar(256) ,
                     city varchar(128) not null ,
                     zip char(5) not null ,
-                    territory_id bigint not null references vendor_approved_territory (territory_id),
+                    territory_id varchar(10) not null references vendor_approved_territory (territory_id),
                     phone varchar(12) not null ,
                     business_email varchar(256) not null unique ,
                     status char(1) not null default 'N',

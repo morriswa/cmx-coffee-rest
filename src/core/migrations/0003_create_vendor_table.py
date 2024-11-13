@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                     address_two varchar(256) ,
                     city varchar(128) not null ,
                     zip char(5) not null ,
-                    territory bigint not null references vendor_approved_territory(territory_id),
+                    territory varchar(10) not null references vendor_approved_territory(territory_id),
                     status char(1) not null default 'A',
                     approved_by uuid references auth_integration (user_id) ,
                     creation_date timestamp not null default current_timestamp
