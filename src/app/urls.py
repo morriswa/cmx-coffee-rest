@@ -60,7 +60,7 @@ urlpatterns = [
     # shopping
     path('s/cart', customer_views.ShoppingCartView.as_view()),
     path('s/checkout', order_views.create_order),
-    path('s/checkout/<str:order_id>', order_views.review_order),
+    path('s/checkout/<str:order_id>', order_views.OrderDraftView.as_view()),
     # vendor
     path('s/vendor/products', vendor_views.VendorProductView.as_view()),
     path('s/vendor/product/<int:product_id>', vendor_views.VendorProductDetailsView.as_view()),
