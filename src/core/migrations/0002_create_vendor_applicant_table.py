@@ -12,15 +12,14 @@ class Migration(migrations.Migration):
                     territory_id bigserial primary key ,
                     state_code char(2) not null unique ,
                     country_code char(3) not null ,
-                    display_name varchar(32) not null unique ,
-                    tax_rate smallint not null check (0 <= tax_rate and tax_rate <= 100) default 0
+                    display_name varchar(32) not null unique
                 );
 
-                insert into vendor_approved_territory(state_code, country_code, display_name, tax_rate)
+                insert into vendor_approved_territory(state_code, country_code, display_name)
                 values
-                    ('KS','USA','Kansas, USA', 10),
-                    ('MO','USA','Missouri, USA', 5),
-                    ('OK','USA','Oklahoma, USA', 2)
+                    ('KS','USA','Kansas, USA'),
+                    ('MO','USA','Missouri, USA'),
+                    ('OK','USA','Oklahoma, USA')
                 ;
 
                 create table vendor_applicant(

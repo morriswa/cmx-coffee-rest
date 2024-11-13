@@ -16,14 +16,16 @@ def get_saved_payment_methods(user_id) -> list[MockPaymentResponse]:
 
 def save_payment_method(user_id, payment_method: CreateMockPaymentRequest):
     with connections.cursor() as cur:
+
         cur.execute("""
         insert into mock_payment
-            (user_id, nickname)
+            (user_id, nickname, billing_address_territory)
         values
-            (%(user_id)s, %(nickname)s)
+            (%(user_id)s, %(nickname)s, %(territory_id)s)
         """,{
             'user_id': user_id,
-            'nickname': payment_method.nickname
+            'nickname': payment_method.nickname,
+            'territory_id': payment_method.territory
         })
 
 def delete_payment_method(user_id, payment_id):

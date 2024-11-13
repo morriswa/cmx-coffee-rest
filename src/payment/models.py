@@ -1,9 +1,11 @@
 
 from app.validation import ValidatedDataModel
 
+
 class CreateMockPaymentRequest(ValidatedDataModel):
     def __init__(self, **kwargs):
         self.nickname = kwargs.get('nickname')
+        self.territory = kwargs.get('territory')
 
 
 class MockPaymentResponse(CreateMockPaymentRequest):

@@ -9,11 +9,29 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             sql="""
+                create table customer_approved_territory(
+                    territory_id varchar(10) primary key,
+                    state_code char(2) not null check ( state_code in ('KS','MO','OK') ),
+                    country_code char(3) not null check ( country_code in ('USA') ) default 'USA',
+                    display_name varchar(32),
+                    tax_rate smallint not null default 0
+                        check (tax_rate >= 0 and tax_rate <= 100)
+                );
+
+                insert into customer_approved_territory
+                    (territory_id, state_code, country_code, display_name, tax_rate)
+                values
+                    ('USA_KS','KS','USA','Kansas, USA', 10),
+                    ('USA_MO','MO','USA','Missouri, USA', 5),
+                    ('USA_OK','OK','USA','Oklahoma, USA', 2)
+                ;
+
                 create table mock_payment(
                     payment_id uuid primary key default gen_random_uuid(),
                     user_id uuid not null references auth_integration(user_id),
                     payment_method char(6) not null default 'dummyd' check (payment_method in ('crcard', 'dbcard', 'extern', 'dummyd')),
-                    nickname varchar(32)
+                    nickname varchar(32),
+                    billing_address_territory varchar(10) not null references customer_approved_territory (territory_id)
                 );
 
                 create table mock_order(
@@ -42,6 +60,7 @@ class Migration(migrations.Migration):
                 drop table if exists mock_order_item;
                 drop table if exists mock_order;
                 drop table if exists mock_payment;
+                drop table if exists customer_approved_territory;
             """
         )
     ]
