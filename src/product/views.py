@@ -17,7 +17,7 @@ def get_product_images(request: Request, product_id: int) -> Response:
 
 @any_view(['GET'])
 def get_products_for_sale(request: Request) -> Response:
-    products: list[BaseProduct] = dao.get_products_for_sale(request.data)
+    products: list[BaseProduct] = dao.get_products_for_sale(request.data, 30)
     products_with_images = []
     for product in products:
         keys = s3client.list(f'cmx/coffee/public/product/{product.product_id}')
