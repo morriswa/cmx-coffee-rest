@@ -59,6 +59,12 @@ def create_order(user_id, orders):
                 'quantity': item.quantity,
                 'each_price': item.each_price
             })
+
+        cur.execute("""
+            delete from shopping_cart
+            where user_id = %(user_id)s
+        """, {'user_id': user_id})
+
         return order_id;
 
 
