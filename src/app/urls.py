@@ -21,6 +21,7 @@ from django.http import HttpResponse
 import admin.views as admin_views
 import core.views as core_views
 import customer.views as customer_views
+import customer_order.views as order_views
 import payment.views as payment_views
 import product.views as product_views
 import product_review.views as review_views  # Import the views for product_reviews app
@@ -58,7 +59,8 @@ urlpatterns = [
 
     # shopping
     path('s/cart', customer_views.ShoppingCartView.as_view()),
-
+    path('s/checkout', order_views.create_order),
+    path('s/checkout/<str:order_id>', order_views.review_order),
     # vendor
     path('s/vendor/products', vendor_views.VendorProductView.as_view()),
     path('s/vendor/product/<int:product_id>', vendor_views.VendorProductDetailsView.as_view()),
