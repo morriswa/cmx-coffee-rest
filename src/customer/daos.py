@@ -19,7 +19,7 @@ def get_shopping_cart(user_id: uuid) -> list[CartItem]:
                 product.product_name,
                 product.description,
                 vendor.business_name vendor_name,
-                product.initial_price
+                product.initial_price sale_price
             from shopping_cart cart
                 left join vendor_product product
                     on cart.product_id = product.product_id
@@ -32,9 +32,7 @@ def get_shopping_cart(user_id: uuid) -> list[CartItem]:
         rows = cur.fetchall()
         cart = []
         for row in rows:
-            sale_price = decimal.Decimal(row['initial_price']) * decimal.Decimal('1.2')
-            sale_price = sale_price.quantize(decimal.Decimal('1.00'), rounding=decimal.ROUND_UP)
-            cart.append(CartItem(**row, sale_price=sale_price))
+            cart.append(CartItem(**row))
         return cart
 
 def update_shopping_cart(user_id: uuid, items: list[tuple[int, int]]) -> list[CartItem]:
