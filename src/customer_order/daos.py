@@ -27,8 +27,8 @@ def collect_shopping_cart(user_id) -> list[CreateOrderItem]:
 def create_order(user_id, orders):
     with connections.cursor() as cur:
         subtotal = sum([item.each_price for item in orders])
+        # TODO add calculate tax rate
         cur.execute("""
-            -- TODO add tax rate
             insert into mock_order
                 (user_id, subtotal, tax_rate, tax, total)
             values
@@ -146,6 +146,7 @@ def delete_order_draft(user_id, order_id):
 
 def submit_order(user_id, order_id, payment_id):
     with connections.cursor() as cur:
+        # TODO add payment validation
         cur.execute("""
             update mock_order
             set
