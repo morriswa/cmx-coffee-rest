@@ -8,6 +8,21 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             sql="""
+                create table vendor_approved_territory(
+                    territory_id bigserial primary key ,
+                    state_code char(2) not null unique ,
+                    country_code char(3) not null ,
+                    display_name varchar(32) not null unique ,
+                    tax_rate smallint not null check (0 <= tax_rate and tax_rate <= 100) default 0
+                );
+
+                insert into vendor_approved_territory(state_code, country_code, display_name, tax_rate)
+                values
+                    ('KS','USA','Kansas, USA', 10),
+                    ('MO','USA','Missouri, USA', 5),
+                    ('OK','USA','Oklahoma, USA', 2)
+                ;
+
                 create table vendor_applicant(
                     application_id bigserial primary key ,
                     user_id uuid not null unique references auth_integration (user_id) on delete cascade ,
@@ -15,9 +30,8 @@ class Migration(migrations.Migration):
                     address_one varchar(256) not null ,
                     address_two varchar(256) ,
                     city varchar(128) not null ,
-                    state char(2) not null ,
                     zip char(5) not null ,
-                    country char(3) not null ,
+                    territory_id bigint not null references vendor_approved_territory (territory_id),
                     phone varchar(12) not null ,
                     business_email varchar(256) not null unique ,
                     status char(1) not null default 'N',
@@ -26,6 +40,7 @@ class Migration(migrations.Migration):
             """,
             reverse_sql="""
                 drop table if exists vendor_applicant;
+                drop table if exists vendor_approved_territory;
             """
         )
     ]

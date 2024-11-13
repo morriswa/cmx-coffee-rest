@@ -13,7 +13,13 @@ from admin.models import AdminVendorInfo
 
 def get_pending_vendor_applications() -> list[VendorApplicationResponse]:
     with connections.cursor() as db:
-        db.execute("select * from vendor_applicant")
+        db.execute("""
+            select
+                *
+            from vendor_applicant apps
+                left join vendor_approved_territory tr
+                    on apps.territory_id = tr.territory_id
+        """)
         results = db.fetchall()
         assert results is not None
         return [VendorApplicationResponse(**result) for result in results]
@@ -35,11 +41,11 @@ def approve_vendor_application(user_id, application_id):
             insert into vendor
                (user_id, business_name, business_email,
                 phone, address_one, address_two, city,
-                state, zip, country, approved_by)
+                zip, territory, approved_by)
             values
                (%(user_id)s, %(business_name)s, %(business_email)s,
                 %(phone)s, %(address_one)s, %(address_two)s, %(city)s,
-                %(state)s, %(zip)s, %(country)s, %(approved_by)s)
+                %(zip)s, %(territory_id)s, %(approved_by)s)
         """, {
             **application_data,
             'approved_by': user_id
@@ -65,8 +71,10 @@ def get_all_vendors() -> list[AdminVendorInfo]:
                 *,
                 usr.email as approver_email
             from vendor ven
-            left join auth_integration usr
-            on ven.approved_by = usr.user_id
+                left join auth_integration usr
+                    on ven.approved_by = usr.user_id
+                left join vendor_approved_territory t
+                    on ven.territory = t.territory_id
         """)
         res = cur.fetchall()
         return [AdminVendorInfo(**data) for data in res]

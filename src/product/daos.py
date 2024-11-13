@@ -23,12 +23,15 @@ def get_products_for_sale(filters = {}, limit = 10):
             pdetails.cb_flavored as flavored,
             pdetails.cb_single_origin as single_origin,
             v.vendor_id,
-            v.business_name
+            v.business_name,
+            t.tax_rate
         from vendor_product product
             left join product_characteristics pdetails
                 on product.product_id = pdetails.product_id
             left join vendor v
                 on product.vendor_id = v.vendor_id
+            left join vendor_approved_territory t
+                on v.territory = t.territory_id
         where product.status = 'A'
     """
     params = {'limit': limit}
@@ -73,7 +76,8 @@ def get_products_for_sale(filters = {}, limit = 10):
         products = []
         for data in res:
             initial_price: decimal.Decimal = data['initial_price']
-            price = initial_price * decimal.Decimal(1.2)
+            tax_rate: float = 1 + (data['tax_rate'] / 100)
+            price = initial_price * decimal.Decimal(tax_rate)
             price = price.quantize(decimal.Decimal('1.00'), rounding=decimal.ROUND_UP)
             products.append(BaseProduct(**data, price=price,))
         return products
@@ -88,10 +92,15 @@ def get_product_details(product_id: int):
                 product.initial_price,
                 pdetails.cb_decaf as decaf,
                 pdetails.cb_flavored as flavored,
-                pdetails.cb_single_origin as single_origin
+                pdetails.cb_single_origin as single_origin,
+                t.tax_rate
             from vendor_product product
-            left join product_characteristics pdetails
-            on product.product_id = pdetails.product_id
+                left join product_characteristics pdetails
+                    on product.product_id = pdetails.product_id
+                left join vendor v
+                    on product.vendor_id = v.vendor_id
+                left join vendor_approved_territory t
+                    on v.territory = t.territory_id
             where product.product_id = %(product_id)s
         """, {
             'product_id': product_id
@@ -99,7 +108,8 @@ def get_product_details(product_id: int):
 
         data = cur.fetchone()
         initial_price: decimal.Decimal = data['initial_price']
-        price = initial_price * decimal.Decimal(1.2)
+        tax_rate: float = 1 + (data['tax_rate'] / 100)
+        price = initial_price * decimal.Decimal(tax_rate)
         price = price.quantize(decimal.Decimal('1.00'), rounding=decimal.ROUND_UP)
 
         return BaseProduct(**data, price=price)

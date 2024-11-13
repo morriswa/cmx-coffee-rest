@@ -18,13 +18,13 @@ def apply_for_vendor(user_id, vendor_application: VendorApplicationRequest):
                 insert into vendor_applicant
                     (user_id,
                     business_name, business_email, phone,
-                    address_one, address_two, city, state,
-                    zip, country)
+                    address_one, address_two, city, zip,
+                    territory_id)
                 values
                     (%(user_id)s,
                     %(name)s, %(email)s, %(phone)s,
-                    %(address_one)s, %(address_two)s, %(city)s, %(state)s,
-                    %(zip)s, %(country)s)
+                    %(address_one)s, %(address_two)s, %(city)s, %(zip)s,
+                    %(territory_id)s)
             """,{
                 'user_id': user_id,
                 'name': vendor_application.business_name,
@@ -33,9 +33,8 @@ def apply_for_vendor(user_id, vendor_application: VendorApplicationRequest):
                 'address_one': vendor_application.address_line_one,
                 'address_two': vendor_application.address_line_two,
                 'city': vendor_application.city,
-                'state': vendor_application.state,
                 'zip': vendor_application.zip,
-                'country': vendor_application.country
+                'territory_id': vendor_application.territory
             })
     except errors.UniqueViolation:
         raise BadRequestException('you have already applied with this account!')
