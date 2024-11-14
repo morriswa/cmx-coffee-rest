@@ -76,29 +76,6 @@ def review_order(user_id, order_id) -> Order:
     with connections.cursor() as cur:
         cur.execute("""
             select
-                items.product_id,
-                pd.product_name,
-
-                items.quantity,
-                items.each_price,
-
-                pd.vendor_id,
-                v.business_name vendor_name
-            from mock_order_item items
-                left join mock_order odr
-                    on items.order_id = odr.order_id
-                left join vendor_product pd
-                    on items.product_id = pd.product_id
-                left join vendor v
-                    on pd.vendor_id = v.vendor_id
-            where odr.user_id = %(user_id)s and odr.order_id = %(order_id)s and odr.status = 'incompl'
-        """, {
-            'user_id':user_id,
-            'order_id':order_id,
-        })
-        items = [OrderItem(**data) for data in cur.fetchall()]
-        cur.execute("""
-            select
                 odr.order_id,
                 odr.payment_id,
                 odr.payment_status,
@@ -108,7 +85,9 @@ def review_order(user_id, order_id) -> Order:
                 odr.tax,
                 odr.total
             from mock_order odr
-            where odr.user_id = %(user_id)s and odr.order_id = %(order_id)s
+            where   odr.user_id = %(user_id)s
+            and     odr.order_id = %(order_id)s
+            and     odr.status = 'incompl'
         """, {
             'user_id': user_id,
             'order_id': order_id,
@@ -116,7 +95,30 @@ def review_order(user_id, order_id) -> Order:
         res = cur.fetchone()
         if res is None:
             raise APIException('failed to retrieve order')
-        return Order(items=items, **res)
+        order = Order(**res)
+
+        cur.execute("""
+            select
+                items.product_id,
+                pd.product_name,
+
+                items.quantity,
+                items.each_price,
+
+                pd.vendor_id,
+                v.business_name vendor_name
+            from mock_order_item items
+                left join vendor_product pd
+                    on items.product_id = pd.product_id
+                left join vendor v
+                    on pd.vendor_id = v.vendor_id
+            where items.order_id = %(order_id)s
+        """, {
+            'order_id':order_id,
+        })
+        # add items to order
+        order.items = [OrderItem(**data) for data in cur.fetchall()]
+        return order
 
 def delete_order_draft(user_id, order_id):
     with connections.cursor() as cur:
