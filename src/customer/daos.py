@@ -92,7 +92,7 @@ def get_customer_preferences(user_id: uuid) -> CustomerPreferences:
                 p_cb_flavored,
                 p_cb_origin_single,
                 p_cb_origin_blend,
-                p_cb_keywords
+                p_cb_keywords,
             FROM customer_preferences
             WHERE user_id = %(user_id)s
         """, {'user_id': user_id})
