@@ -13,7 +13,7 @@ from vendor.models import VendorApplicationResponse
 
 class PendingVendorApplicationEndpointTests(APITestCase):
     def test_get_pending_vendor_applications_403(self):
-        # submit mock http request to health endpoint
+        # setup
         self.client.force_authenticate(
             user=User(
                 user_id=uuid.uuid4(),
@@ -23,7 +23,11 @@ class PendingVendorApplicationEndpointTests(APITestCase):
                 jwt_permissions=[]
             ),
         )
+
+        # submit mock http request to health endpoint
         response = self.client.get('/s/admin/vendor-applications')
+
+        # assert
         self.assertEqual(response.status_code, 403, 'default users are not allowed...')
         self.assertEqual(
             response.data,
@@ -32,7 +36,10 @@ class PendingVendorApplicationEndpointTests(APITestCase):
         )
 
     def test_get_pending_vendor_applications_401(self):
+        # execute
         response = self.client.get('/s/admin/vendor-applications')
+
+        # assert
         self.assertEqual(response.status_code, 401, 'anon users are not allowed...')
         self.assertEqual(
             response.data,
@@ -63,6 +70,7 @@ class PendingVendorApplicationEndpointTests(APITestCase):
         'admin.daos.get_pending_vendor_applications',
     )
     def test_get_pending_vendor_applications_200(self, mock_function):
+        # setup
         mock_function.return_value = self.mock_get_pending_vendor_applications()
         self.client.force_authenticate(
             user=User(
@@ -74,7 +82,10 @@ class PendingVendorApplicationEndpointTests(APITestCase):
             ),
         )
 
+        # execute
         response = self.client.get('/s/admin/vendor-applications')
+
+        # assert
         self.assertEqual(response.status_code, 200, 'admin users should get requested data...')
         self.assertTrue(
             isinstance(response.data, list),
@@ -96,10 +107,8 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
     @patch(
         'admin.daos.approve_vendor_application'
     )
-    @patch(
-        'admin.daos.reject_vendor_application',
-    )
-    def test_approve_pending_vendor_application_200(self, rva, ava):
+    def test_approve_pending_vendor_application_200(self, approve_vendor_application):
+        # setup
         self.client.force_authenticate(
             user=User(
                 user_id=uuid.uuid4(),
@@ -112,16 +121,18 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
         app_id = 1234
         applicant_user_id = uuid.uuid4()
 
+        # execute
         response = self.client.put(
             f"/s/admin/vendor-application/{app_id}?action=approve"
         )
 
+        # assert
         self.assertEqual(response.status_code, 204, 'good')
 
     @patch(
         'admin.daos.approve_vendor_application',
     )
-    def test_approve_pending_vendor_application_400_no_such_application(self, ava):
+    def test_approve_pending_vendor_application_400_no_such_application(self, approve_vendor_application):
         # setup
         self.client.force_authenticate(
             user=User(
@@ -134,7 +145,7 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
         )
         application_id = 1234
         err_msg = f'could not retrieve application {application_id}, not approving...'
-        ava.side_effect = BadRequestException(err_msg)
+        approve_vendor_application.side_effect = BadRequestException(err_msg)
 
         # action
         response = self.client.put(
@@ -150,6 +161,7 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
         )
 
     def test_reject_pending_vendor_application_200(self):
+        # setup
         self.client.force_authenticate(
             user=User(
                 user_id=uuid.uuid4(),
@@ -159,15 +171,18 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
                 jwt_permissions=['cmx_coffee:admin']
             ),
         )
-
         app_id = 1234
+
+        # execute
         response = self.client.put(
             f"/s/admin/vendor-application/{app_id}?action=reject"
         )
 
+        # assert
         self.assertEqual(response.status_code, 204, 'good')
 
     def test_process_pending_vendor_application_400_invalid_action(self):
+        # setup
         self.client.force_authenticate(
             user=User(
                 user_id=uuid.uuid4(),
@@ -178,10 +193,13 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
             ),
         )
         app_id = 1234
+
+        # execute
         response = self.client.put(
             f"/s/admin/vendor-application/{app_id}?action=nonsense"
         )
 
+        # assert
         self.assertEqual(response.status_code, 400, 'should get 400')
         self.assertEqual(response.data, {'msg': 'invalid action'}, 'correct error')
 
@@ -211,6 +229,7 @@ class GetVendorEndpointTests(APITestCase):
     def test_get_vendors_200(self, get_all_vendors):
         # setup
         get_all_vendors.return_value = self.mock_get_all_vendors()
+
         # execute
         self.client.force_authenticate(
             user=User(
@@ -221,9 +240,8 @@ class GetVendorEndpointTests(APITestCase):
                 jwt_permissions=['cmx_coffee:admin']
             ),
         )
-        response = self.client.get(
-            f"/s/admin/vendors"
-        )
+        response = self.client.get(f"/s/admin/vendors")
+
         # assert
         res_vendor = response.data[0]
         self.assertEqual(res_vendor['vendor_id'], 1, 'should have correct id')

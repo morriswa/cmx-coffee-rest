@@ -41,8 +41,10 @@ class PendingVendorApplicationDAOTests(TestCase):
     def test_get_pending_vendor_applications(self):
         # setup
         self.__setup_get_pending_vendor_applications()
+
         # execute
         response = admin_dao.get_pending_vendor_applications()
+
         # assert
         self.assertTrue(
             isinstance(response, list),
@@ -96,10 +98,13 @@ class ProcessPendingVendorApplicationDAOTests(TestCase):
         return gen_application_id, applicant_user_id
 
     def test_approve_pending_vendor_application(self):
+        # setup
         app_id, applicant_user_id = self.__setup_process_pending_vendor_application()
 
+        # execute
         admin_dao.approve_vendor_application(applicant_user_id, app_id)
 
+        # assert
         with connections.cursor() as cur:
             cur.execute("""
                 select * from vendor_applicant where application_id = %(app_id)s
@@ -115,10 +120,13 @@ class ProcessPendingVendorApplicationDAOTests(TestCase):
             self.assertEqual(res['business_name'], 'test application 1', 'data should be correct')
 
     def test_approve_pending_vendor_application_no_such_application(self):
+        # setup
         application_id = 1234
-
         try:
+            # execute
             admin_dao.approve_vendor_application(uuid.uuid4(), application_id)
+        # assert
+            self.assertEqual(0, 1, 'this should never be called')
         except BadRequestException as bre:
             self.assertEqual(
                 bre.json(),
@@ -127,10 +135,13 @@ class ProcessPendingVendorApplicationDAOTests(TestCase):
             )
 
     def test_reject_pending_vendor_application(self):
+        # setup
         app_id, applicant_user_id = self.__setup_process_pending_vendor_application()
 
+        # execute
         admin_dao.reject_vendor_application(app_id)
 
+        # assert
         with connections.cursor() as cur:
             cur.execute("""
                 select * from vendor_applicant where application_id = %(app_id)s
@@ -179,9 +190,13 @@ class GetVendorDAOTests(TestCase):
         return vendor_id
 
     def test_get_vendors(self):
+        # setup
         vendor_id = self.__setup_get_vendors()
 
+        # execute
         response = admin_dao.get_all_vendors()
+
+        # assert
         self.assertEqual(len(response), 1, '1 vendor in db')
         res_vendor = response[0]
         self.assertEqual(res_vendor.vendor_id, vendor_id, 'should have correct id')
