@@ -32,7 +32,7 @@ class APIException(Exception, _APIException):
 
     @override
     def json(self): return {
-        "error": self.error
+        "msg": self.error
     }
 
     @override
@@ -72,7 +72,7 @@ def app_exception_handler(exc, context):
     if (isinstance(exc, exceptions.AuthenticationFailed)
         or isinstance(exc, exceptions.PermissionDenied)
         or isinstance(exc, exceptions.NotFound)):
-        return Response({"msg": exc.detail}, status=exc.status_code)
+        return Response({"msg": str(exc.detail)}, status=exc.status_code)
 
     # default case
     logging.error(f"encountered unexpected exception {exc.__class__.__name__}: {str(exc)}")

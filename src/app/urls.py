@@ -36,7 +36,6 @@ handler404 = lambda *args, **kwargs: HttpResponse(status=404)
 urlpatterns = [
     # core app
     path('health', core_views.health),
-    path('aux', core_views.aux),
     path('s/permissions', core_views.permissions),
 
     # public product endpoints
