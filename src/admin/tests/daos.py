@@ -1,45 +1,17 @@
+
 import uuid
 
 from django.test import TestCase
-from django.conf import settings
-
-from rest_framework.test import APITestCase
 
 from app.authentication import User
 from app import connections
+from app.exceptions import BadRequestException
+
+import admin.daos as admin_dao
 
 
-class PendingVendorApplicationEndpointTests(APITestCase):
-    def test_get_pending_vendor_applications_403(self):
-        # submit mock http request to health endpoint
-        self.client.force_authenticate(
-            user=User(
-                user_id=uuid.uuid4(),
-                email='test@morriswa.org',
-                username='test@morriswa.org',
-                vendor_id=None,
-                jwt_permissions=[]
-            ),
-        )
-        response = self.client.get('/s/admin/vendor-applications')
-        self.assertEqual(response.status_code, 403, 'default users are not allowed...')
-        self.assertEqual(
-            response.data,
-            {'msg': 'You do not have permission to perform this action.'},
-            'correct body'
-        )
-
-    def test_get_pending_vendor_applications_401(self):
-        response = self.client.get('/s/admin/vendor-applications')
-        self.assertEqual(response.status_code, 401, 'anon users are not allowed...')
-        self.assertEqual(
-            response.data,
-            {'msg': 'Failed to provide Authorization header'},
-            'correct body'
-        )
-
-    def __setup_get_pending_vendor_applications_200(self):
-
+class PendingVendorApplicationDAOTests(TestCase):
+    def __setup_get_pending_vendor_applications(self):
         with connections.cursor() as cur:
             applicant_user_id = uuid.uuid4();
             admin_user_id = uuid.uuid4();
@@ -66,39 +38,30 @@ class PendingVendorApplicationEndpointTests(APITestCase):
                 'applicant_id': applicant_user_id
             })
 
-        self.client.force_authenticate(
-            user=User(
-                user_id=admin_user_id,
-                email='test@morriswa.org',
-                username='test@morriswa.org',
-                vendor_id=None,
-                jwt_permissions=['cmx_coffee:admin']
-            ),
-        )
-
-    def test_get_pending_vendor_applications_200(self):
-
-        self.__setup_get_pending_vendor_applications_200()
-
-        response = self.client.get('/s/admin/vendor-applications')
-        self.assertEqual(response.status_code, 200, 'admin users should get requested data...')
+    def test_get_pending_vendor_applications(self):
+        # setup
+        self.__setup_get_pending_vendor_applications()
+        # execute
+        response = admin_dao.get_pending_vendor_applications()
+        # assert
         self.assertTrue(
-            isinstance(response.data, list),
+            isinstance(response, list),
             'correct body format (json list)'
         )
         self.assertEqual(
-            len(response.data),
+            len(response),
             1,
             '1 application in db'
         )
         self.assertEqual(
-            response.data[0]['business_name'],
+            response[0].business_name,
             'test application 1',
             'correct value retrieved from db'
         )
 
-class ProcessPendingVendorApplicationEndpointTests(APITestCase):
-    def __setup_process_pending_vendor_application_200(self):
+
+class ProcessPendingVendorApplicationDAOTests(TestCase):
+    def __setup_process_pending_vendor_application(self):
         gen_application_id = None
         applicant_user_id = uuid.uuid4();
         admin_user_id = uuid.uuid4();
@@ -130,26 +93,12 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
             })
             gen_application_id = cur.fetchone()['application_id']
 
-        self.client.force_authenticate(
-            user=User(
-                user_id=admin_user_id,
-                email='test@morriswa.org',
-                username='test@morriswa.org',
-                vendor_id=None,
-                jwt_permissions=['cmx_coffee:admin']
-            ),
-        )
-
         return gen_application_id, applicant_user_id
 
-    def test_approve_pending_vendor_application_200(self):
-        app_id, applicant_user_id = self.__setup_process_pending_vendor_application_200()
+    def test_approve_pending_vendor_application(self):
+        app_id, applicant_user_id = self.__setup_process_pending_vendor_application()
 
-        response = self.client.put(
-            f"/s/admin/vendor-application/{app_id}?action=approve"
-        )
-
-        self.assertEqual(response.status_code, 204, 'good')
+        admin_dao.approve_vendor_application(applicant_user_id, app_id)
 
         with connections.cursor() as cur:
             cur.execute("""
@@ -165,35 +114,22 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
             self.assertIsNotNone(res, 'vendor should have been created after approval')
             self.assertEqual(res['business_name'], 'test application 1', 'data should be correct')
 
-    def test_approve_pending_vendor_application_400_no_such_application(self):
-        self.client.force_authenticate(
-            user=User(
-                user_id=uuid.uuid4(),
-                email='test@morriswa.org',
-                username='test@morriswa.org',
-                vendor_id=None,
-                jwt_permissions=['cmx_coffee:admin']
-            ),
-        )
+    def test_approve_pending_vendor_application_no_such_application(self):
         application_id = 1234
-        response = self.client.put(
-            f"/s/admin/vendor-application/{application_id}?action=approve"
-        )
-        self.assertEqual(response.status_code, 400, 'should get bad response')
-        self.assertEqual(
-            response.data,
-            {'msg': f'could not retrieve application {application_id}, not approving...'},
-            'not found error'
-        )
 
-    def test_reject_pending_vendor_application_200(self):
-        app_id, applicant_user_id = self.__setup_process_pending_vendor_application_200()
+        try:
+            admin_dao.approve_vendor_application(uuid.uuid4(), application_id)
+        except BadRequestException as bre:
+            self.assertEqual(
+                bre.json(),
+                {'msg': f'could not retrieve application {application_id}, not approving...'},
+                'should get bad response'
+            )
 
-        response = self.client.put(
-            f"/s/admin/vendor-application/{app_id}?action=reject"
-        )
+    def test_reject_pending_vendor_application(self):
+        app_id, applicant_user_id = self.__setup_process_pending_vendor_application()
 
-        self.assertEqual(response.status_code, 204, 'good')
+        admin_dao.reject_vendor_application(app_id)
 
         with connections.cursor() as cur:
             cur.execute("""
@@ -208,20 +144,10 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
             res = cur.fetchone()
             self.assertIsNone(res, 'vendor should NOT have been created after reject')
 
-    def test_process_pending_vendor_application_400_invalid_action(self):
-        app_id, applicant_user_id = self.__setup_process_pending_vendor_application_200()
 
-        response = self.client.put(
-            f"/s/admin/vendor-application/{app_id}?action=nonsense"
-        )
+class GetVendorDAOTests(TestCase):
 
-        self.assertEqual(response.status_code, 400, 'should get 400')
-        self.assertEqual(response.data, {'msg': 'invalid action'}, 'correct error')
-
-
-class GetVendorEndpointTests(APITestCase):
-
-    def __setup_get_vendors_200(self):
+    def __setup_get_vendors(self):
         user_id_vendor = uuid.uuid4()
         user_id_approver = uuid.uuid4()
         vendor_id = None
@@ -250,23 +176,13 @@ class GetVendorEndpointTests(APITestCase):
             })
             vendor_id = cur.fetchone()['vendor_id']
 
-        self.client.force_authenticate(
-            user=User(
-                user_id=uuid.uuid4(),
-                email='test@morriswa.org',
-                username='test@morriswa.org',
-                vendor_id=None,
-                jwt_permissions=['cmx_coffee:admin']
-            ),
-        )
         return vendor_id
 
-    def test_get_vendors_200(self):
-        vendor_id = self.__setup_get_vendors_200()
+    def test_get_vendors(self):
+        vendor_id = self.__setup_get_vendors()
 
-        response = self.client.get('/s/admin/vendors')
-        self.assertEqual(response.status_code, 200, 'good')
-        self.assertEqual(len(response.data), 1, '1 vendor in db')
-        res_vendor = response.data[0]
-        self.assertEqual(res_vendor['vendor_id'], vendor_id, 'should have correct id')
-        self.assertEqual(res_vendor['approver_email'], 'approver@morriswa.org', 'should have correct email')
+        response = admin_dao.get_all_vendors()
+        self.assertEqual(len(response), 1, '1 vendor in db')
+        res_vendor = response[0]
+        self.assertEqual(res_vendor.vendor_id, vendor_id, 'should have correct id')
+        self.assertEqual(res_vendor.approver_email, 'approver@morriswa.org', 'should have correct email')
