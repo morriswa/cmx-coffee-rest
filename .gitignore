@@ -8,6 +8,9 @@ Scripts
 ### ides ###
 .idea/
 
+### testing ###
+.coverage
+
 ### pyjunk ###
 **/__pycache__/
 **.egg-info
