@@ -7,7 +7,6 @@ Scripts
 
 ### ides ###
 .idea/
-.vscode/
 
 ### pyjunk ###
 **/__pycache__/
