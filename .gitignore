@@ -7,7 +7,9 @@ Scripts
 
 ### ides ###
 .idea/
-.vscode/
+
+### testing ###
+.coverage
 
 ### pyjunk ###
 **/__pycache__/

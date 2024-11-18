@@ -61,6 +61,10 @@ and run following commands
 - Run test script
       
       python test.py
+- Run test script with coverage
+      
+      coverage run test.py
+      coverage report -m
 
 ## Django Migrate Guide
 please note all database scripts are located in src/core/migrations 

@@ -159,15 +159,17 @@ class CreateProductRequest(VendorProduct):
 
         if self.product_name is None:
             validation_errors.append(('product_name', 'should not be null'))
+        elif not 4 <= len(self.product_name) <= 128:
+            validation_errors.append(('product_name', 'should be 4-128 characters'))
+
+        if self.description is not None \
+            and len(self.description) > 10_000:
+            validation_errors.append(('description', 'may not be more than 10_000 chars'))
 
         if self.initial_price is None:
             validation_errors.append(('initial_price', 'should not be null'))
-
-        if self.initial_price <= 0:
-            validation_errors.append(('initial_price', 'cannot be 0 or negative'))
-
-        if 999.99 < self.initial_price:
-            validation_errors.append(('initial_price', 'cannot be above 999.99'))
+        elif not 0 <= self.initial_price <= 999.99:
+            validation_errors.append(('initial_price', 'should be in range [0, 999.99]'))
 
         if len(validation_errors) > 0:
             raise ValidationException(validation_errors)
@@ -185,12 +187,17 @@ class UpdateProductRequest(VendorProduct):
 
         validation_errors = []
 
-        if self.initial_price is not None:
-            if self.initial_price <= 0:
-                validation_errors.append(('initial_price', 'cannot be 0 or negative'))
+        if self.initial_price is not None \
+            and not 0 <= self.initial_price <= 999.99:
+            validation_errors.append(('initial_price', 'should be in range [0, 999.99]'))
 
-            if 999.99 < self.initial_price:
-                validation_errors.append(('initial_price', 'cannot be above 999.99'))
+        if self.description is not None \
+            and len(self.description) > 10_000:
+            validation_errors.append(('description', 'may not be more than 10_000 chars'))
+
+        if self.initial_price is not None \
+            and not 0 <= self.initial_price <= 999.99:
+            validation_errors.append(('initial_price', 'should be in range [0, 999.99]'))
 
         if len(validation_errors) > 0:
             raise ValidationException(validation_errors)
