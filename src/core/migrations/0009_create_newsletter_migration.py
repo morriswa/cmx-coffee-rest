@@ -8,13 +8,13 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             sql = """
                 alter table customer_preferences
-                add column newsletter char(1)
+                add column n_newsletter_subscription char(1)
                     not null default 'n'
-                    check ( newsletter in ('y', 'n') );
+                    check ( n_newsletter_subscription in ('y', 'n') );
             """,
             reverse_sql= """
                 alter table customer_preferences
-                drop column newsletter;
+                drop column n_newsletter_subscription;
             """
         )
     ]

@@ -31,17 +31,6 @@ class CustomerPreferencesView(UserView):
 
         return Response(status=204)
 
-    @staticmethod
-    def patch(request: Request) -> Response:
-        #create the datamodel
-        newsletter_subscription = CustomerPreferences(**request.data)  #directly use the request data dictionary.
-
-        #Call the DAO function to update customer preferences with the user ID and preferences data.
-        user_id = request.user.user_id
-        dao.update_customer_newsletter(user_id, newsletter_subscription)
-
-        return Response(status=204)
-
 
 class ShoppingCartView(UserView):
 

@@ -93,7 +93,7 @@ def get_customer_preferences(user_id: uuid) -> CustomerPreferences:
                 p_cb_origin_single,
                 p_cb_origin_blend,
                 p_cb_keywords,
-                p_cb_newsletter_subscription,
+                n_newsletter_subscription,
             FROM customer_preferences
             WHERE user_id = %(user_id)s
         """, {'user_id': user_id})
@@ -110,7 +110,7 @@ def get_customer_preferences(user_id: uuid) -> CustomerPreferences:
                 flavored=row['p_cb_flavored'],
                 single_origin=row['p_cb_origin_single'],
                 origin_blend=row['p_cb_origin_blend'],
-                newsletter_subscription=row['pb_cb_newsletter_subscription']
+                newsletter_subscription=row['n_newsletter_subscription']
             )
         else:
             raise BadRequestException(f'could not locate customer preferences for user {user_id}')
@@ -131,13 +131,13 @@ def update_customer_preferences(user_id: uuid, request: CustomerPreferences):
                      p_cb_strength_mild, p_cb_strength_med,
                      p_cb_strength_bold, p_cb_strength_blonde,
                      p_cb_caf, p_cb_decaf, p_cb_flavored,
-                     p_cb_origin_single, p_cb_origin_blend, p_cb_newsletter_subscription)
+                     p_cb_origin_single, p_cb_origin_blend, n_newsletter_subscription)
                 VALUES
                     (%(user_id)s,
                     %(p_cb_strength_mild)s, %(p_cb_strength_med)s,
                     %(p_cb_strength_bold)s, %(p_cb_strength_blonde)s,
                     %(p_cb_caf)s, %(p_cb_decaf)s, %(p_cb_flavored)s,
-                    %(p_cb_origin_single)s, %(p_cb_origin_blend)s, %(p_cb_newsletter_subscription)s
+                    %(p_cb_origin_single)s, %(p_cb_origin_blend)s, %(n_newsletter_subscription)s)
             """, {
                 'user_id': user_id,
                 'p_cb_strength_mild': request.strength_mild,
@@ -149,7 +149,7 @@ def update_customer_preferences(user_id: uuid, request: CustomerPreferences):
                 'p_cb_flavored': request.flavored,
                 'p_cb_origin_single': request.single_origin,
                 'p_cb_origin_blend': request.origin_blend,
-                'p_cb_newsletter_subscription': request.newsletter_subscription
+                'n_newsletter_subscription': request.newsletter_subscription
             })
         else:
             cur.execute("""
@@ -164,7 +164,7 @@ def update_customer_preferences(user_id: uuid, request: CustomerPreferences):
                     p_cb_flavored = COALESCE(%(p_cb_flavored)s, p_cb_flavored),
                     p_cb_origin_single = COALESCE(%(p_cb_origin_single)s, p_cb_origin_single),
                     p_cb_origin_blend = COALESCE(%(p_cb_origin_blend)s, p_cb_origin_blend),
-                    p_cb_newsletter_subscription = COALESCE(%(p_cb_newsletter_subscription)s, p_cb_newsletter_subscription)
+                    n_newsletter_subscription = COALESCE(%(n_newsletter_subscription)s, n_newsletter_subscription)
                 WHERE user_id = %(user_id)s
             """, {
                 'user_id': user_id,
@@ -177,5 +177,5 @@ def update_customer_preferences(user_id: uuid, request: CustomerPreferences):
                 'p_cb_flavored': request.flavored,
                 'p_cb_origin_single': request.single_origin,
                 'p_cb_origin_blend': request.origin_blend,
-                'p_cb_newsletter_subscription': request.newsletter_subscription
+                'n_newsletter_subscription': request.newsletter_subscription
             })
