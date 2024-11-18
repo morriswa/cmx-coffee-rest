@@ -10,6 +10,8 @@ from app.authentication import User
 
 class RuntimeTests(TestCase):
     def test_app_in_test_runtime(self):
+        """ simple test to ensure test environment is setup correctly """
+
         #Get the runtime environment
         runtime = settings.RUNTIME_ENVIRONMENT
         #Assert that the runtime environemnt is test
@@ -17,6 +19,8 @@ class RuntimeTests(TestCase):
 
 class HealthEndpointTests(APITestCase):
     def test_health_endpoint_200(self):
+        """ ensure health endpoint produces desired ouput """
+
         # submit mock http request to health endpoint
         response = self.client.get('/health')
         # assert response status and body is correct
@@ -25,6 +29,8 @@ class HealthEndpointTests(APITestCase):
 
 class UserPermissionsEndpointTests(APITestCase):
     def test_user_permissions_endpoint_401(self):
+        """ ensure only authenticated users can access secure user permissions endpoint"""
+
         # submit mock http request to health endpoint
         response = self.client.get('/s/permissions')
         # assert response status and body is correct
@@ -36,7 +42,9 @@ class UserPermissionsEndpointTests(APITestCase):
         )
 
     def test_user_permissions_endpoint_200(self):
-        # submit mock http request to health endpoint
+        """ ensure authenticated users can get an accurate list of their permissions """
+
+        # setup
         self.client.force_authenticate(
             user=User(
                 user_id=uuid.uuid4(),
@@ -46,6 +54,8 @@ class UserPermissionsEndpointTests(APITestCase):
                 jwt_permissions=[]
             ),
         )
+
+        # submit mock http request to health endpoint
         response = self.client.get('/s/permissions')
 
         # assert response status and body is correct

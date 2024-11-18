@@ -11,8 +11,11 @@ from admin.models import AdminVendorInfo
 from vendor.models import VendorApplicationResponse
 
 
+
 class PendingVendorApplicationEndpointTests(APITestCase):
     def test_get_pending_vendor_applications_403(self):
+        """ ensure users without admin permission are denied access to this endpoint """
+
         # setup
         self.client.force_authenticate(
             user=User(
@@ -36,6 +39,8 @@ class PendingVendorApplicationEndpointTests(APITestCase):
         )
 
     def test_get_pending_vendor_applications_401(self):
+        """ ensure users with no authentication header are denied access to this endpoint """
+
         # execute
         response = self.client.get('/s/admin/vendor-applications')
 
@@ -49,6 +54,7 @@ class PendingVendorApplicationEndpointTests(APITestCase):
 
     @staticmethod
     def mock_get_pending_vendor_applications():
+        """ unittest mock for admin.daos.get_pending_vendor_applications """
         apps = []
         apps.append(VendorApplicationResponse(
             application_id=1,
@@ -66,12 +72,11 @@ class PendingVendorApplicationEndpointTests(APITestCase):
         ))
         return apps
 
-    @patch(
-        'admin.daos.get_pending_vendor_applications',
+    @patch(  # replace dao function with mock to test view in isolation
+        'admin.daos.get_pending_vendor_applications', mock_get_pending_vendor_applications
     )
-    def test_get_pending_vendor_applications_200(self, mock_function):
+    def test_get_pending_vendor_applications_200(self):
         # setup
-        mock_function.return_value = self.mock_get_pending_vendor_applications()
         self.client.force_authenticate(
             user=User(
                 user_id=uuid.uuid4(),
@@ -107,7 +112,9 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
     @patch(
         'admin.daos.approve_vendor_application'
     )
-    def test_approve_pending_vendor_application_200(self, approve_vendor_application):
+    def test_approve_pending_vendor_application_200(self, mock_approve_vendor_application):
+        """ ensure admins can approve vendors """
+
         # setup
         self.client.force_authenticate(
             user=User(
@@ -133,6 +140,8 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
         'admin.daos.approve_vendor_application',
     )
     def test_approve_pending_vendor_application_400_no_such_application(self, approve_vendor_application):
+        """ ensure admins get correct error response if application does not exist """
+
         # setup
         self.client.force_authenticate(
             user=User(
@@ -161,6 +170,8 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
         )
 
     def test_reject_pending_vendor_application_200(self):
+        """ ensure admins can reject vendors """
+
         # setup
         self.client.force_authenticate(
             user=User(
@@ -182,6 +193,8 @@ class ProcessPendingVendorApplicationEndpointTests(APITestCase):
         self.assertEqual(response.status_code, 204, 'good')
 
     def test_process_pending_vendor_application_400_invalid_action(self):
+        """ ensure admins recieve correct error is they input an invalid application action """
+
         # setup
         self.client.force_authenticate(
             user=User(
@@ -208,6 +221,8 @@ class GetVendorEndpointTests(APITestCase):
 
     @staticmethod
     def mock_get_all_vendors():
+        """ mock unittest method for admin.daos.get_all_vendors """
+
         apps = []
         apps.append(AdminVendorInfo(
             vendor_id=1,
@@ -225,10 +240,9 @@ class GetVendorEndpointTests(APITestCase):
         ))
         return apps
 
-    @patch('admin.daos.get_all_vendors')
-    def test_get_vendors_200(self, get_all_vendors):
-        # setup
-        get_all_vendors.return_value = self.mock_get_all_vendors()
+    @patch('admin.daos.get_all_vendors', mock_get_all_vendors)
+    def test_get_vendors_200(self):
+        """ ensure admin/vendor view is working as expected when provided with a valid database response """
 
         # execute
         self.client.force_authenticate(

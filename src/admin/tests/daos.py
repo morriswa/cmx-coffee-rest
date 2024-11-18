@@ -12,6 +12,7 @@ import admin.daos as admin_dao
 
 class PendingVendorApplicationDAOTests(TestCase):
     def __setup_get_pending_vendor_applications(self):
+        """ database setup for get_pending_vendor_applications test """
         with connections.cursor() as cur:
             applicant_user_id = uuid.uuid4();
             admin_user_id = uuid.uuid4();
@@ -39,6 +40,8 @@ class PendingVendorApplicationDAOTests(TestCase):
             })
 
     def test_get_pending_vendor_applications(self):
+        """ ensure dao correctly retrieves vendors from tables"""
+
         # setup
         self.__setup_get_pending_vendor_applications()
 
@@ -64,6 +67,8 @@ class PendingVendorApplicationDAOTests(TestCase):
 
 class ProcessPendingVendorApplicationDAOTests(TestCase):
     def __setup_process_pending_vendor_application(self):
+        """ database setup for approve_pending_vendor_application test """
+
         gen_application_id = None
         applicant_user_id = uuid.uuid4();
         admin_user_id = uuid.uuid4();
@@ -98,6 +103,8 @@ class ProcessPendingVendorApplicationDAOTests(TestCase):
         return gen_application_id, applicant_user_id
 
     def test_approve_pending_vendor_application(self):
+        """ ensure dao completes necessary steps in application approval process """
+
         # setup
         app_id, applicant_user_id = self.__setup_process_pending_vendor_application()
 
@@ -120,13 +127,13 @@ class ProcessPendingVendorApplicationDAOTests(TestCase):
             self.assertEqual(res['business_name'], 'test application 1', 'data should be correct')
 
     def test_approve_pending_vendor_application_no_such_application(self):
+        """ ensure dao behaves correctly if given an invalid application_id """
+
         # setup
         application_id = 1234
         try:
             # execute
             admin_dao.approve_vendor_application(uuid.uuid4(), application_id)
-        # assert
-            self.assertEqual(0, 1, 'this should never be called')
         except BadRequestException as bre:
             self.assertEqual(
                 bre.json(),
@@ -135,6 +142,8 @@ class ProcessPendingVendorApplicationDAOTests(TestCase):
             )
 
     def test_reject_pending_vendor_application(self):
+        """ ensure dao completes necessary steps in application reject process """
+
         # setup
         app_id, applicant_user_id = self.__setup_process_pending_vendor_application()
 
@@ -159,6 +168,8 @@ class ProcessPendingVendorApplicationDAOTests(TestCase):
 class GetVendorDAOTests(TestCase):
 
     def __setup_get_vendors(self):
+        """ database setup for get_vendors test"""
+
         user_id_vendor = uuid.uuid4()
         user_id_approver = uuid.uuid4()
         vendor_id = None
@@ -190,6 +201,7 @@ class GetVendorDAOTests(TestCase):
         return vendor_id
 
     def test_get_vendors(self):
+        """ ensure dao correctly maps vendor table to datamodels """
         # setup
         vendor_id = self.__setup_get_vendors()
 
