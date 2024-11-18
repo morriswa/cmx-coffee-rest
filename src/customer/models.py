@@ -97,5 +97,5 @@ class CustomerPreferences(ValidatedDataModel):
 
         if self.newsletter_subscription is not None and \
             self.newsletter_subscription not in ['y', 'n']:
-            execs.append('newsletter_subscription',
-                        "valid values are ['y', 'n']")
+            excs.append(('newsletter_subscription',
+                          "valid values are ['y', 'n']"))
