@@ -46,6 +46,7 @@ class CustomerPreferences(ValidatedDataModel):
         self.flavored = kwargs.get('flavored')
         self.single_origin = kwargs.get('single_origin')
         self.origin_blend = kwargs.get('origin_blend')
+        self.newsletter_subscription = kwargs.get('newsletter_subscription')
 
     @override
     def validate(self) -> None:
@@ -93,3 +94,8 @@ class CustomerPreferences(ValidatedDataModel):
             self.origin_blend not in ['y', 'n']:
             excs.append(('origin_blend',
                          "valid values are ['y','n']"))
+
+        if self.newsletter_subscription is not None and \
+            self.newsletter_subscription not in ['y', 'n']:
+            execs.append('newsletter_subscription',
+                        "valid values are ['y', 'n']")
