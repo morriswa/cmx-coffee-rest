@@ -5,16 +5,9 @@
 
 import json
 import jwt
-import logging
-import os
 import requests
-import uuid
-from functools import wraps
-from typing import override, Optional
 
 from django.conf import settings
-from django.contrib.auth import authenticate
-from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 
 import app.connections
@@ -52,81 +45,29 @@ def get_token_auth_header(request):
     """
     auth = request.META.get("HTTP_AUTHORIZATION", None)
     if auth is None:
-        raise exceptions.AuthenticationFailed('Failed to provide Authorization header', code=401)
+        return None
     parts = auth.split()
     token = parts[1]
 
     return token
 
-def register_user_in_db(email:str):
-    with app.connections.cursor() as cursor:
-        cursor.execute(
-            "insert into auth_integration (email) values (%(email)s)",
-            {'email': email}
-        )
-        cursor.execute(
-            "select user_id from auth_integration where email = (%(email)s)",
-            {'email': email}
-        )
-        result = cursor.fetchone()
-        if result is None:
-            logging.error(f'failed to register user with email {email}')
-            raise Exception('bad stuff happened')
 
-        user_id = result.get('user_id')
-        logging.info(f'successfully registered user {user_id} with email {email}')
-        return user_id
-
-def get_user_info_from_db(email: str) -> tuple[uuid, Optional[int]]:
-    user_id = None
-    vendor_id = None
-    with app.connections.cursor() as cursor:
-        cursor.execute(
-            "select user_id from auth_integration where email = %(email)s",
-            {'email': email}
-        )
-        result = cursor.fetchone()
-        if result is None:
-            logging.info(f'did not find database entry for user with email {email}, attemping registration')
-            return register_user_in_db(email), None
-
-        user_id = result['user_id']
-
-        cursor.execute(
-            "select vendor_id from vendor where user_id = %(user_id)s",
-            {'user_id': user_id}
-        )
-        result = cursor.fetchone()
-        if result is not None:
-            vendor_id = result['vendor_id']
-
-    return user_id, vendor_id
-
-
-def jwt_has_scope(decoded_token, required_scopes: list[str]) -> bool:
+def jwt_has_scope(decoded_token, required_scopes: set[str]) -> bool:
     # retrieve scope string from token
     token_scope_str = decoded_token.get("scope")
 
-    has_all_scopes = True
-
     if token_scope_str:  # if scope was present
-        token_scopes = token_scope_str.split()  # split on whitespace
-        for token_scope in required_scopes:
-            # make sure all required scopes are present in token's provided scopes
-            if token_scope not in token_scopes:
-                has_all_scopes = False
+        # split on whitespace to get set of token scopes
+        token_scopes = set(token_scope_str.split())
+        # if token scopes contains all items in required scopes, return true
+        return set(token_scopes).issuperset(required_scopes)
 
-    return has_all_scopes
+    # else false
+    return False
 
-def jwt_has_permissions(decoded_token, required_permissions: list[str]) -> bool:
+def jwt_has_permissions(decoded_token, required_permissions: set[str]) -> bool:
     # retrieve scope string from
-    token_permissions = decoded_token.get('permissions') or []
+    token_permissions = set(decoded_token.get('permissions') or [])
 
-    has_all_permissions = True
+    return set(token_permissions).issuperset(required_permissions)
 
-    for permission in required_permissions:
-        # make sure all required permissions are present in token's provided permission array
-        if permission not in token_permissions:
-            has_all_permissions = False
-
-    return has_all_permissions

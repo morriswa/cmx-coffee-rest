@@ -7,6 +7,7 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 
 from .utils import *
+from .daos import *
 from .models import User
 
 
@@ -23,7 +24,7 @@ class UserAuthenticationWithJwt(BaseAuthentication):
         """ :return None if auth request was rejected, else User, Auth tuple """
         token = get_token_auth_header(request)
         if token is None:  # if no auth header is found the user is not authenticated
-            return None
+            raise exceptions.AuthenticationFailed('Failed to provide Authorization header', code=401)
 
         try:
             # attempt decoding auth header as jwt
@@ -48,3 +49,5 @@ class UserAuthenticationWithJwt(BaseAuthentication):
             raise exceptions.AuthenticationFailed('Error decoding token.')
         except jwt.InvalidTokenError:
             raise exceptions.AuthenticationFailed('Invalid token.')
+        except:
+            raise exceptions.AuthenticationFailed('Failed to authenticate, no further details.')
