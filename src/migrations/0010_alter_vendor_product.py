@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
             sql = """
                 alter table vendor_product
                 alter column description type varchar(10000),
-                alter column product_name type varchar(128);
+                alter column product_name type varchar(256);
             """,
             reverse_sql= """
                 alter table vendor_product
