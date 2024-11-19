@@ -129,6 +129,8 @@ DATABASES = {
     }
 }
 
+MIGRATION_MODULES = {'core': 'migrations'}
+
 
 # Step 5)
 # security setup

@@ -16,7 +16,7 @@ from app.authentication.utils import *
 class UserAuthenticationWithJwtTests(TestCase):
 
     @mock.patch('app.authentication.jwt_decode_token')
-    @mock.patch('app.authentication.get_user_info_from_db')
+    @mock.patch('app.authentication.get_user_info')
     def test_successfully_authenticate_user(self, mock_get_user_info_from_db, mock_jwt_decode_token):
 
         # setup
@@ -41,6 +41,36 @@ class UserAuthenticationWithJwtTests(TestCase):
         self.assertEqual(user.user_id, mock_user_id, 'user id should match')
         self.assertIsNone(user.vendor_id, 'no vendor id was provided, should be none')
         self.assertSetEqual(set(user.permissions), {'cmx_coffee:appuser'}, 'should only have default auth, no elevated permissions')
+
+
+    @mock.patch('app.authentication.jwt_decode_token')
+    @mock.patch('app.authentication.get_user_info')
+    def test_successfully_authenticate_vendor(self, mock_get_user_info_from_db, mock_jwt_decode_token):
+
+        # setup
+        mock_user_id = uuid.uuid4()
+        mock_vendor_id = 1
+        mock_get_user_info_from_db.return_value = mock_user_id, mock_vendor_id
+        mock_jwt_decode_token.return_value = {
+            'permissions': [],
+            'email': 'test@morriswa.org',
+        }
+
+        request = type('test_request', (object,), {})
+        request.META = {
+            'HTTP_AUTHORIZATION': 'Bearer Test'
+        }
+
+        auth = UserAuthenticationWithJwt()
+
+        # execute
+        user, token = auth.authenticate(request)
+
+        # assert
+        self.assertEqual(user.user_id, mock_user_id, 'user id should match')
+        self.assertEqual(user.vendor_id, mock_vendor_id, 'vendor id was provided, should match')
+        self.assertSetEqual(set(user.permissions), {'cmx_coffee:appuser', 'cmx_coffee:vendor'},
+                            'should have default auth and vendor permissions')
 
     def test_reject_user_no_auth_header(self):
         # setup
