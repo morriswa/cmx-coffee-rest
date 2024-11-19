@@ -22,11 +22,6 @@ class PendingVendorApplicationDAOTests(TestCase):
                 values
                     (%(applicant_id)s, 'applicant@morriswa.org');
 
-                insert into vendor_approved_territory
-                    (territory_id, state_code, country_code, display_name)
-                values
-                    ('TEST_CASE', 'CA', 'USA', 'Test Case USA');
-
                 insert into vendor_applicant
                     (user_id,
                     business_name, business_email, phone,
@@ -34,7 +29,7 @@ class PendingVendorApplicationDAOTests(TestCase):
                 values
                     (%(applicant_id)s,
                      'test application 1', 'applicant@morriswa.org', '1231231234',
-                     '1234 Address Line One', NULL, 'City', '55555','TEST_CASE')
+                     '1234 Address Line One', NULL, 'City', '55555','USA_KS')
             """, {
                 'applicant_id': applicant_user_id
             })
@@ -80,11 +75,6 @@ class ProcessPendingVendorApplicationDAOTests(TestCase):
                     (%(applicant_id)s, 'applicant@morriswa.org'),
                     (%(admin_id)s, 'admin@morriswa.org');
 
-                insert into vendor_approved_territory
-                    (territory_id, state_code, country_code, display_name)
-                values
-                    ('TEST_CASE', 'CA', 'USA', 'Test Case USA');
-
                 insert into vendor_applicant
                     (user_id,
                     business_name, business_email, phone,
@@ -92,7 +82,7 @@ class ProcessPendingVendorApplicationDAOTests(TestCase):
                 values
                     (%(applicant_id)s,
                      'test application 1', 'applicant@morriswa.org', '1231231234',
-                     '1234 Address Line One', NULL, 'City', '55555','TEST_CASE')
+                     '1234 Address Line One', NULL, 'City', '55555','USA_OK')
                 returning application_id;
             """, {
                 'applicant_id': applicant_user_id,
@@ -181,16 +171,12 @@ class GetVendorDAOTests(TestCase):
                     (%(user_id_vendor)s, 'vendor@morriswa.org'),
                     (%(user_id_approver)s, 'approver@morriswa.org');
 
-                insert into vendor_approved_territory
-                    (territory_id, state_code, country_code, display_name)
-                values ('USA_TEST', 'CA', 'USA', 'Test Case USA');
-
                 insert into vendor
                     (user_id, business_name, business_email, phone,
                     address_one, city, zip, territory, approved_by)
                 values
                     (%(user_id_vendor)s, 'Business Name', 'vendor@vendor.org', '1231231234',
-                    'address line 1', 'city', '55555', 'USA_TEST', %(user_id_approver)s)
+                    'address line 1', 'city', '55555', 'USA_MO', %(user_id_approver)s)
                 returning vendor_id;
             """, {
                 'user_id_vendor': user_id_vendor,
