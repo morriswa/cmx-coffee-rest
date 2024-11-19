@@ -61,6 +61,9 @@ and run following commands
 - Run test script
       
       python test.py
+- Install coverage library
+
+      pip install coverage
 - Run test script with coverage
       
       coverage run test.py

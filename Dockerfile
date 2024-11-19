@@ -23,7 +23,7 @@ COPY default.properties .
 COPY setup.py .
 COPY pyproject.toml .
 
-RUN pip install .
+RUN pip install . gunicorn
 
 # set entrypoint (command which will run when container is started)
 CMD ["gunicorn", "-b", "localhost:8001", "--chdir", "/app", "app.wsgi"]
