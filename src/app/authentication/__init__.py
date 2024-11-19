@@ -34,7 +34,7 @@ class UserAuthenticationWithJwt(BaseAuthentication):
             email = payload.get('email')
 
             # attempt retrieving user info from db using authentication email
-            user_id, vendor_id = get_user_info_from_db(email)
+            user_id, vendor_id = get_user_info(email)
 
             # create custom django user with retrieved info
             user = User(email=email, user_id=user_id, vendor_id=vendor_id, jwt_permissions=jwt_permissions)

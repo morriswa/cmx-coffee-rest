@@ -16,7 +16,7 @@ from app.authentication.utils import *
 class UserAuthenticationWithJwtTests(TestCase):
 
     @mock.patch('app.authentication.jwt_decode_token')
-    @mock.patch('app.authentication.get_user_info_from_db')
+    @mock.patch('app.authentication.get_user_info')
     def test_successfully_authenticate_user(self, mock_get_user_info_from_db, mock_jwt_decode_token):
 
         # setup

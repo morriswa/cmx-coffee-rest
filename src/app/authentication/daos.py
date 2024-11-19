@@ -9,30 +9,27 @@ from typing import Optional
 
 
 import app.connections
-from app.exceptions import BadRequestException
+from app.exceptions import APIException
 
 
 
-def register_user_in_db(email:str):
+def register_user(email:str):
     with app.connections.cursor() as cursor:
         cursor.execute(
-            "insert into auth_integration (email) values (%(email)s)",
-            {'email': email}
-        )
-        cursor.execute(
-            "select user_id from auth_integration where email = (%(email)s)",
+            "insert into auth_integration (email) values (%(email)s) returning user_id;",
             {'email': email}
         )
         result = cursor.fetchone()
         if result is None:
-            logging.error(f'failed to register user with email {email}')
-            raise Exception('bad stuff happened')
+            msg = f'failed to register user with email {email}'
+            logging.error(msg)
+            raise APIException(msg)
 
         user_id = result.get('user_id')
         logging.info(f'successfully registered user {user_id} with email {email}')
         return user_id
 
-def get_user_info_from_db(email: str) -> tuple[uuid, Optional[int]]:
+def get_user_info(email: str) -> tuple[uuid, Optional[int]]:
     user_id = None
     vendor_id = None
     with app.connections.cursor() as cursor:
@@ -43,7 +40,7 @@ def get_user_info_from_db(email: str) -> tuple[uuid, Optional[int]]:
         result = cursor.fetchone()
         if result is None:
             logging.info(f'did not find database entry for user with email {email}, attemping registration')
-            return register_user_in_db(email), None
+            return register_user(email), None
 
         user_id = result['user_id']
 
