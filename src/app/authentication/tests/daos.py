@@ -55,7 +55,6 @@ class RegisterUserDAOTests(TestCase):
 class GetUserInfoDAOTests(TestCase):
 
     def __setup_get_user(self):
-        print(settings.DATABASES['default']['HOST'])
         user_id = uuid.uuid4()
         test_email = 'test@morriswa.org'
         with connections.cursor() as cur:
@@ -80,8 +79,6 @@ class GetUserInfoDAOTests(TestCase):
         user_id = uuid.uuid4()
         test_email = 'test@morriswa.org'
         with connections.cursor() as cur:
-            cur.execute("select * from vendor_approved_territory")
-            print(cur.fetchall())
             cur.execute("""
                 insert into auth_integration (user_id, email)
                 values
@@ -109,3 +106,22 @@ class GetUserInfoDAOTests(TestCase):
         self.assertIsNotNone(res, 'should get response')
         self.assertEqual(res[0], user_id, 'user_id should be returned')
         self.assertEqual(res[1], vendor_id, 'vendor_id should be returned')
+
+    def test_get_and_register_user(self):
+
+        test_email = 'test@morriswa.org'
+        res = get_user_info(test_email)
+
+        self.assertIsNotNone(res, 'should get response')
+        self.assertIsNotNone(res[0], 'user_id should be returned')
+        self.assertIsNone(res[1], 'vendor_id should NOT be returned')
+
+        with connections.cursor() as cur:
+            cur.execute("""
+                select * from auth_integration
+                where user_id = %(user_id)s
+            """, {'user_id': res[0]})
+            row = cur.fetchone()
+
+            self.assertIsNotNone(row, 'row should be created')
+            self.assertEqual(test_email, row['email'], 'email should be correct')

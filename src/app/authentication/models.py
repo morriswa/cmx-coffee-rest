@@ -14,9 +14,6 @@ class User:
         self.vendor_id: int = kwargs.get('vendor_id')
         self.__jwt_permissions: list[str] = kwargs.get('jwt_permissions') or []
 
-    def json(self):
-        return vars(self)
-
     @property
     def permissions(self) -> list[str]:
         # add token permissions
