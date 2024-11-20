@@ -131,6 +131,10 @@ DATABASES = {
 
 MIGRATION_MODULES = {'core': 'migrations'}
 
+AWS_S3_ENVIRONMENT = os.getenv('AWS_S3_ENVIRONMENT')
+if AWS_S3_ENVIRONMENT is None:
+    raise EnvironmentError('failed to specify required property AWS_S3_ENVIRONMENT')
+
 
 # Step 5)
 # security setup

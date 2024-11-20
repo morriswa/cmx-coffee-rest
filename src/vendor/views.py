@@ -9,11 +9,11 @@ from rest_framework.response import Response
 
 from app.views import VendorView
 from app.decorators import user_view, vendor_view
-from app import s3client
 from app.exceptions import BadRequestException
 
 from vendor.models import VendorApplicationRequest, CreateProductRequest, UpdateProductRequest
 import vendor.daos as dao
+from vendor import content as vc
 
 
 @user_view(['POST'])
@@ -79,9 +79,7 @@ class VendorProductImagesView(VendorView):
     @staticmethod
     def get(request: Request, product_id: int) -> Response:
         dao.assert_vendor_owns_product(request.user.vendor_id, product_id)
-        keylist: list[str] = s3client.list(f'cmx/coffee/public/product/{product_id}')
-
-        key_image_pairs = [{'id':key.split('/')[-1],'url': s3client.get(key)} for key in keylist]
+        key_image_pairs = vc.get_product_images_with_keys(product_id)
         return Response(status=200, data=key_image_pairs)
 
     @staticmethod
@@ -90,19 +88,7 @@ class VendorProductImagesView(VendorView):
         # assert logged in vendor has permission to modify product
         dao.assert_vendor_owns_product(vendor_id, product_id)
 
-        # count images that belong to product
-        product_prefix = f'cmx/coffee/public/product/{product_id}'
-        image_count = len(s3client.list(product_prefix))
-        if image_count >= 10:  # and throw error if the max has been reached
-            raise BadRequestException('cannot have more than 10 images for a product, not uploading...')
-
-        # generate uuid for image
-        image_id = uuid.uuid4()
-        s3client.upload(  # and upload
-            request.FILES.get('image_upload'),
-            f'{product_prefix}/{image_id}'
-        )
-
+        image_id = vc.upload_product_image(product_id, request.FILES.get('image_upload'))
         # return generated id
         return Response(status=200, data=image_id)
 
@@ -112,6 +98,5 @@ def delete_product_image(request: Request, product_id: int, image_id: str) -> Re
     vendor_id: int = request.user.vendor_id
     # assert logged in vendor has permission to modify product
     dao.assert_vendor_owns_product(vendor_id, product_id)
-
-    s3client.delete(f'cmx/coffee/public/product/{product_id}/{image_id}')
+    vc.delete_product_image(product_id, image_id)
     return Response(status=204)

@@ -2,17 +2,16 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from app import s3client
 from app.decorators import any_view
 
 from product.models import BaseProduct
 import product.daos as dao
+from product import content
 
 
 @any_view(['GET'])
 def get_product_images(request: Request, product_id: int) -> Response:
-    keylist = s3client.list(f'cmx/coffee/public/product/{product_id}')
-    images = [s3client.get(key) for key in keylist]
+    images = content.get_product_images(product_id)
     return Response(status=200, data=images)
 
 @any_view(['GET'])
@@ -20,12 +19,7 @@ def get_products_for_sale(request: Request) -> Response:
     products: list[BaseProduct] = dao.get_products_for_sale(request.data, 30)
     products_with_images = []
     for product in products:
-        keys = s3client.list(f'cmx/coffee/public/product/{product.product_id}')
-        first_image = None
-        if len(keys) > 0:
-            key = keys[0]
-            first_image = s3client.get(key)
-            product.first_image = first_image
+        product.first_image = content.get_random_product_image(product.product_id)
         products_with_images.append(product)
 
     return Response(status=200, data=[product.json() for product in products_with_images])

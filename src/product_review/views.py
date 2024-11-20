@@ -4,7 +4,6 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from app import s3client
 from app.decorators import user_view, any_view
 
 import product_review.daos as dao
