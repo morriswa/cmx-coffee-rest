@@ -10,8 +10,14 @@ from app import s3client
 def get_product_images_with_keys(product_id) -> list:
     """ WARNING: assumes request has ALREADY BEEN AUTHORIZED """
 
-    keylist: list[str] = s3client.list(f'coffee/public/product/{product_id}')
-    return [{'id': key.split('/')[-1], 'url': s3client.get(key)} for key in keylist]
+    image_ids: list[str] = s3client.list(f'coffee/public/product/{product_id}')
+    return [
+        {
+            'id': image_id,
+            'url': s3client.get(f'coffee/public/product/{product_id}/{image_id}')
+        }
+        for image_id in image_ids
+    ]
 
 def upload_product_image(product_id, image):
     """ WARNING: assumes request has ALREADY BEEN AUTHORIZED """

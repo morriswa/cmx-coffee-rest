@@ -21,7 +21,7 @@ def list(prefix):
     for page in paginator.paginate(Bucket=__s3_bucket, Prefix=f'{__s3_environment}/{prefix}'):
         if 'Contents' in page:
             for obj in page['Contents']:
-                objects.append(obj['Key'])
+                objects.append(str(obj['Key']).removeprefix(f'{__s3_environment}/{prefix}'))
     return objects
 
 def upload(upload_file, key) -> None:
