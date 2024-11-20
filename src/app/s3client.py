@@ -18,10 +18,10 @@ __s3_environment = os.getenv('AWS_S3_ENVIRONMENT')
 def list(prefix):
     objects = []
     paginator = __s3_client.get_paginator('list_objects_v2')
-    for page in paginator.paginate(Bucket=__s3_bucket, Prefix=f'{__s3_environment}/{prefix}'):
+    for page in paginator.paginate(Bucket=__s3_bucket, Prefix=f'{__s3_environment}/{prefix}/'):
         if 'Contents' in page:
             for obj in page['Contents']:
-                objects.append(str(obj['Key']).removeprefix(f'{__s3_environment}/{prefix}'))
+                objects.append(str(obj['Key']).removeprefix(f'{__s3_environment}/{prefix}/'))
     return objects
 
 def upload(upload_file, key) -> None:
