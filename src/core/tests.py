@@ -12,10 +12,18 @@ class RuntimeTests(TestCase):
     def test_app_in_test_runtime(self):
         """ simple test to ensure test environment is setup correctly """
 
-        #Get the runtime environment
-        runtime = settings.RUNTIME_ENVIRONMENT
         #Assert that the runtime environemnt is test
-        self.assertEqual(runtime, 'test', 'Application should have been bootstrapped in test runtime')
+        self.assertEqual(
+            settings.RUNTIME_ENVIRONMENT,
+            'test',
+            'Application should have been bootstrapped in test runtime'
+        )
+        self.assertEqual(
+            settings.AWS_S3_ENVIRONMENT,
+            'test',
+            'S3 should have been bootstrapped in test environment'
+        )
+
 
 class HealthEndpointTests(APITestCase):
     def test_health_endpoint_200(self):
