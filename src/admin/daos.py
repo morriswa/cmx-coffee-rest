@@ -9,6 +9,9 @@ from app.exceptions import BadRequestException
 
 from vendor.models import VendorApplicationResponse
 from admin.models import AdminVendorInfo
+from customer.models import CustomerPreferences
+
+
 
 
 def get_pending_vendor_applications() -> list[VendorApplicationResponse]:
@@ -78,3 +81,17 @@ def get_all_vendors() -> list[AdminVendorInfo]:
         """)
         res = cur.fetchall()
         return [AdminVendorInfo(**data) for data in res]
+
+def get_all_newsletter_subscriber_emails() -> list[CustomerPreferences]:
+    with connections.cursor() as cur:
+        cur.execute(
+            """
+            select email,
+            from auth_integration
+            where newsletter_subscription in (
+                select newsletter_subscription
+                from customer_preferences
+                where customer_preferences = 'y'
+            """)
+        res = cur.fetchall()
+        return [CustomerPreferences(**data) for data in res];

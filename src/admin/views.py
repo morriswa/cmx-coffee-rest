@@ -33,3 +33,8 @@ def process_pending_vendor_application(request: Request, application_id: int) ->
 def get_all_vendors(request: Request) -> Response:
     vendors = admin_dao.get_all_vendors()
     return Response(status=200, data=[vendor.json() for vendor in vendors])
+
+@admin_view(['GET'])
+def get_all_newsletter_subscriber_emails(request: Request) -> Response:
+    emails = admin_dao.get_all_newsletter_subscriber_emails()
+    return Response(status=200, data=[email.json() for email in emails])
