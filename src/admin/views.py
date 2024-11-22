@@ -45,5 +45,6 @@ def send_test_email(request: Request):
         request.data['message'],
         settings.EMAIL_HOST_USER,
        [request.data['recipient']],
+       html_message="src/static/app-email-template.html"
     )
     return Response(status=204)
