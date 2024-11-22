@@ -86,12 +86,12 @@ def get_all_newsletter_subscriber_emails() -> list[CustomerPreferences]:
     with connections.cursor() as cur:
         cur.execute(
             """
-            select email,
-            from auth_integration
-            where newsletter_subscription in (
-                select newsletter_subscription
-                from customer_preferences
-                where customer_preferences = 'y'
+            select auth.email
+            from auth_integration auth
+                left join customer_preferences cus
+                    on auth.user_id = cus.user_id
+            where
+                cus.n_newsletter_subscription = 'y'
             """)
         res = cur.fetchall()
         return [CustomerPreferences(**data) for data in res];
