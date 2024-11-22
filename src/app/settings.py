@@ -157,3 +157,12 @@ from rest_framework.permissions import IsAuthenticated
 DJANGO_USER_PERMISSION_CLASSES = [IsAuthenticated]
 DJANGO_VENDOR_PERMISSION_CLASSES = DJANGO_USER_PERMISSION_CLASSES + [WithPermissions(VENDOR_PERMISSIONS)]
 DJANGO_ADMIN_PERMISSION_CLASSES = DJANGO_USER_PERMISSION_CLASSES + [WithPermissions(ADMIN_PERMISSIONS)]
+
+
+# add send email conf
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')

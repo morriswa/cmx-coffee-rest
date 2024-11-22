@@ -2,6 +2,10 @@
     Admin-related django views (http request actions) go here
 """
 import logging
+
+from django.core import mail
+from django.conf import settings
+
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -33,3 +37,13 @@ def process_pending_vendor_application(request: Request, application_id: int) ->
 def get_all_vendors(request: Request) -> Response:
     vendors = admin_dao.get_all_vendors()
     return Response(status=200, data=[vendor.json() for vendor in vendors])
+
+@admin_view(['POST'])
+def send_test_email(request: Request):
+    mail.send_mail(
+        request.data['subject'],
+        request.data['message'],
+        settings.EMAIL_HOST_USER,
+       [request.data['recipient']],
+    )
+    return Response(status=204)

@@ -34,6 +34,9 @@ handler404 = lambda *args, **kwargs: HttpResponse(status=404)
 # rest api paths
 # 's/' prefix for endpoints requiring an authorization header
 urlpatterns = [
+    # temp
+    path('test/email', admin_views.send_test_email),
+
     # core app
     path('health', core_views.health),
     path('s/permissions', core_views.permissions),
