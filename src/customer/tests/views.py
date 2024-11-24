@@ -14,16 +14,16 @@ class CustomerPreferencesViewTests(APITestCase):
     def test_get_customer_preferences_200(self, mock_get_customer_preferences):
 
         mock_get_customer_preferences.return_value = CustomerPreferences(
-            strength_mild = True,
-            strength_med = False,
-            strength_bold = True,
-            blonde = False,
-            caffinated = True,
-            decaf = False,
-            flavored = True,
-            single_origin = True,
-            origin_blend = False,
-            newsletter_subscription = 'daily'
+            strength_mild = 'y',
+            strength_med = 'n',
+            strength_bold = 'n',
+            blonde = 'n',
+            caffinated = 'y',
+            decaf = 'n',
+            flavored = 'y',
+            single_origin = 'y',
+            origin_blend = 'n',
+            newsletter_subscription = 'y'
         )
 
         self.client.force_authenticate(User(
@@ -37,16 +37,16 @@ class CustomerPreferencesViewTests(APITestCase):
         response = self.client.get('/s/profile/product-preferences')
 
         self.assertEqual(response.status_code, 200, 'customers should get requested data...')
-        self.assertEqual(response.data['strength_mild'], True)
-        self.assertEqual(response.data['strength_med'], False)
-        self.assertEqual(response.data['strength_bold'], True)
-        self.assertEqual(response.data['blonde'], False)
-        self.assertEqual(response.data['caffinated'], True)
-        self.assertEqual(response.data['decaf'], False)
-        self.assertEqual(response.data['flavored'], True)
-        self.assertEqual(response.data['single_origin'], True)
-        self.assertEqual(response.data['origin_blend'], False)
-        self.assertEqual(response.data['newsletter_subscription'], 'daily')
+        self.assertEqual(response.data['strength_mild'], 'y')
+        self.assertEqual(response.data['strength_med'], 'n')
+        self.assertEqual(response.data['strength_bold'], 'n')
+        self.assertEqual(response.data['blonde'], 'n')
+        self.assertEqual(response.data['caffinated'], 'y')
+        self.assertEqual(response.data['decaf'], 'n')
+        self.assertEqual(response.data['flavored'], 'y')
+        self.assertEqual(response.data['single_origin'], 'y')
+        self.assertEqual(response.data['origin_blend'], 'n')
+        self.assertEqual(response.data['newsletter_subscription'], 'y')
 
 
     @patch('customer.daos.update_customer_preferences')
