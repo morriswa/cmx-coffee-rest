@@ -55,5 +55,4 @@ def send_test_email(request: Request):
        recipient_list=recipient,
        html_message=message
     )
-
     return Response(status=204)
