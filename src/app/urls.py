@@ -74,5 +74,5 @@ urlpatterns = [
     path('s/admin/vendor-applications', admin_views.get_pending_vendor_applications),
     path('s/admin/vendor-application/<int:application_id>', admin_views.process_pending_vendor_application),
     path('s/admin/vendors', admin_views.get_all_vendors),
-    path('s/admin/newsletter', admin_views.send_test_email)
+    path('s/test/newsletter', admin_views.send_test_email)
 ]

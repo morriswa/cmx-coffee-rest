@@ -3,6 +3,7 @@
 """
 import logging
 
+
 from django.core import mail
 from django.conf import settings
 
@@ -40,11 +41,19 @@ def get_all_vendors(request: Request) -> Response:
 
 @admin_view(['POST'])
 def send_test_email(request: Request):
+    subject_message = 'K&M Coffee Co. Newsletter'
+    recipient = ['kevin.rivers14832@ku.edu']
+
+    #Reads the file that holds the newsletter template and assigns it to variable used later.
+    with open("src/static/app-email-template.html", "r") as file:
+        message = file.read()
+
     mail.send_mail(
-        request.data['subject'],
-        request.data['message'],
-        settings.EMAIL_HOST_USER,
-       [request.data['recipient']],
-       html_message="src/static/app-email-template.html"
+       subject=subject_message,
+       message="",
+       from_email=settings.EMAIL_HOST_USER,
+       recipient_list=recipient,
+       html_message=message
     )
+
     return Response(status=204)
