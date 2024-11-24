@@ -35,7 +35,7 @@ def get_shopping_cart(user_id: uuid) -> list[CartItem]:
             cart.append(CartItem(**row))
         return cart
 
-def update_shopping_cart(user_id: uuid, items: list[tuple[int, int]]) -> list[CartItem]:
+def update_shopping_cart(user_id: uuid, items: list[tuple[int, int]]) -> None:
     with connections.cursor() as cur:   # open a database cursor
         for item in items:   # for every item in the cart...
             # check if the item is already present in the user's cart
