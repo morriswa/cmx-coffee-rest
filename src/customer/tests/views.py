@@ -65,9 +65,8 @@ class CustomerPreferencesViewTests(APITestCase):
         ))
 
         request_body = {
-            'strength_mild': strength_mild,
-            'strength_med': strength_med,
-            'decaf': decaf
+            'strength_mild': 'y',
+            'decaf': 'n'
         }
 
         response = self.client.patch('/s/profile/product-preferences', data=request_body, format='json')
