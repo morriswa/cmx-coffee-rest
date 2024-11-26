@@ -11,8 +11,7 @@ import customer_order.daos as dao
 
 @user_view(['POST'])
 def create_order(request):
-    items = dao.collect_shopping_cart(request.user.user_id)
-    order_id = dao.create_order(request.user.user_id, items)
+    order_id = dao.create_order(request.user.user_id)
     return Response(status=200, data={
         'order_id': order_id
     })
