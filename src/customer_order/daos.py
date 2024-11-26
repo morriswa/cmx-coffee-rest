@@ -19,7 +19,7 @@ def create_order(user_id) -> uuid.UUID:
                 left join vendor_product pr
                     on cart.product_id = pr.product_id
             where   cart.user_id = %(user_id)s
-            and     cart.quantity > 1
+            and     cart.quantity > 0
         """, {
             'user_id': user_id,
         })
@@ -47,8 +47,7 @@ def create_order(user_id) -> uuid.UUID:
             'total': subtotal,
         })
         res = cur.fetchone()
-        if res is None:
-            raise APIException('failed to retrieve newly created order ID')
+        assert res is not None
         order_id = res['order_id']
         item: CreateOrderItem
         for item in items:
@@ -120,7 +119,7 @@ def review_order(user_id, order_id) -> Order:
         order.items = [OrderItem(**data) for data in cur.fetchall()]
         return order
 
-def delete_order_draft(user_id, order_id):
+def delete_order_draft(user_id, order_id) -> None:
     with connections.cursor() as cur:
         cur.execute("""
             select status
