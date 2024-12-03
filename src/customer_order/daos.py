@@ -1,4 +1,5 @@
 
+import uuid
 from rest_framework import exceptions
 
 from app import connections
@@ -7,7 +8,7 @@ from app.exceptions import APIException, BadRequestException
 from customer_order.models import CreateOrderItem, OrderItem, Order
 
 
-def collect_shopping_cart(user_id) -> list[CreateOrderItem]:
+def create_order(user_id) -> uuid.UUID:
     with connections.cursor() as cur:
         cur.execute("""
             select
@@ -17,18 +18,18 @@ def collect_shopping_cart(user_id) -> list[CreateOrderItem]:
             from shopping_cart cart
                 left join vendor_product pr
                     on cart.product_id = pr.product_id
-            where cart.user_id = %(user_id)s
+            where   cart.user_id = %(user_id)s
+            and     cart.quantity > 0
         """, {
             'user_id': user_id,
         })
-        return [CreateOrderItem(**data) for data in cur.fetchall()]
+        items = [CreateOrderItem(**data) for data in cur.fetchall()]
 
-
-def create_order(user_id, orders):
-    with connections.cursor() as cur:
+        if len(items) < 1:
+            raise BadRequestException('cannot checkout with an empty cart')
 
         subtotal = 0
-        for item in orders:
+        for item in items:
             subtotal += ( item.quantity * item.each_price )
 
         # TODO add calculate tax rate
@@ -46,23 +47,21 @@ def create_order(user_id, orders):
             'total': subtotal,
         })
         res = cur.fetchone()
-        if res is None:
-            raise APIException('failed to retrieve newly created order ID')
+        assert res is not None
         order_id = res['order_id']
         item: CreateOrderItem
-        for item in orders:
-            if item.quantity > 0:
-                cur.execute("""
-                    insert into mock_order_item
-                        (order_id, product_id, quantity, each_price)
-                    values
-                        (%(order_id)s, %(product_id)s, %(quantity)s, %(each_price)s)
-                """, {
-                    'order_id': order_id,
-                    'product_id': item.product_id,
-                    'quantity': item.quantity,
-                    'each_price': item.each_price
-                })
+        for item in items:
+            cur.execute("""
+                insert into mock_order_item
+                    (order_id, product_id, quantity, each_price)
+                values
+                    (%(order_id)s, %(product_id)s, %(quantity)s, %(each_price)s)
+            """, {
+                'order_id': order_id,
+                'product_id': item.product_id,
+                'quantity': item.quantity,
+                'each_price': item.each_price
+            })
 
         cur.execute("""
             delete from shopping_cart
@@ -120,7 +119,7 @@ def review_order(user_id, order_id) -> Order:
         order.items = [OrderItem(**data) for data in cur.fetchall()]
         return order
 
-def delete_order_draft(user_id, order_id):
+def delete_order_draft(user_id, order_id) -> None:
     with connections.cursor() as cur:
         cur.execute("""
             select status
@@ -167,7 +166,7 @@ def submit_order(user_id, order_id, payment_id):
             'order_id': order_id
         })
 
-def get_customer_orders(user_id):
+def get_customer_orders(user_id) -> list[Order]:
     with connections.cursor() as cur:
         cur.execute("""
             select

@@ -18,6 +18,8 @@ class CreateOrderItem(ValidatedDataModel):
 
         if self.quantity is None:
             raise ValueError('quantity may never be none')
+        elif self.quantity < 1:
+            raise ValueError('quantity must be at least 1')
 
         if self.each_price is None:
             raise ValueError('each_price may never be none')
