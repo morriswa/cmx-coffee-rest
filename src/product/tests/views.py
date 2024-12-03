@@ -1,19 +1,17 @@
-import uuid
+
 from unittest.mock import patch
 from rest_framework.test import APITestCase
-from app.authentication import User
-import product.daos as dao
+
 from product.models import BaseProduct
 
 
-class product_details_get_test(APITestCase):
-    
+class GetProductDetailsEndpointTests(APITestCase):
     @patch('product.daos.get_product_details')
     def test_get_product_details_200(self, mock_get_product_details):
         product_id = 1
         vendor_id = 1
         mock_get_product_details.return_value = BaseProduct(
-            product_id= product_id,
+            product_id=product_id,
             product_name='test product',
             description='test product description',
             price=10.00,
@@ -26,7 +24,8 @@ class product_details_get_test(APITestCase):
             first_image='test_image.jpg'
         )
 
-        response = self.client.get('/product/1')
+        response = self.client.get(f'/product/{product_id}')
+
         self.assertEqual(response.status_code, 200, 'customers should get requested data...')
         self.assertEqual(response.data['product_id'],product_id )
         self.assertEqual(response.data['product_name'],'test product')
