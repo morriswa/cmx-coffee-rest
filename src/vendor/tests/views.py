@@ -101,7 +101,7 @@ class VendorProductViewTests(APITestCase):
             cur.execute("""
                 INSERT INTO auth_integration (user_id, email)
                 VALUES (%(user_id)s, %(email)s);
-               
+
                 INSERT INTO vendor
                 (user_id, business_name, business_email, phone, address_one, city, zip, territory)
                 VALUES
@@ -509,7 +509,3 @@ class VendorProductImagesViewTests(APITestCase):
         image_id = 'image1'
         response = self.client.delete(f'/s/vendor/product/{other_product_id}/image/{image_id}')
         self.assertEqual(response.status_code, 403, 'Should not be able to delete images of another vendor\'s product')
-
-
-
-
