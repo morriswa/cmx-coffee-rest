@@ -5,7 +5,7 @@ import uuid
 
 from typing import Optional
 from app import s3client
-
+from app.exceptions import BadRequestException
 
 def get_product_images_with_keys(product_id) -> list:
     """ WARNING: assumes request has ALREADY BEEN AUTHORIZED """

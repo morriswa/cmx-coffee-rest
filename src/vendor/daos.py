@@ -95,7 +95,7 @@ def list_product(vendor_id, user_id, product: CreateProductRequest):
 
 
 def get_products(vendor_id: int) -> list[VendorProductResponse]:
-    with cursor() as cur:
+    with cursor() as cur: 
         cur.execute("""
             select
                 product.product_id,
@@ -119,7 +119,7 @@ def get_products(vendor_id: int) -> list[VendorProductResponse]:
             and     product.status = 'A'
         """,{'vendor_id': vendor_id})
         res = cur.fetchall()
-        return [VendorProductResponse(**product) for product in res]
+        return [VendorProductResponse(**product) for product in res] # line 122
 
 
 def get_product_details(vendor_id: int, product_id: int):

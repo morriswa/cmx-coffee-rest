@@ -26,7 +26,7 @@ class BaseApplication(ValidatedDataModel):
         validation_exceptions = []
 
         if self.business_name is None:
-            validation_exceptions.append(('business_name','not null'))
+            validation_exceptions.append(('business_name','not null')) 
 
         if self.address_line_one is None:
             validation_exceptions.append(('address_line_one','not null'))
@@ -50,7 +50,23 @@ class VendorApplicationRequest(BaseApplication):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+    @override
+    def validate(self):
+        validation_exceptions = []
 
+        # Collect errors from super().validate()
+        try:
+            super().validate()
+        except ValidationException as e:#line 60
+            validation_exceptions.extend(e.errors)#line 61
+
+        if self.territory is None:
+            validation_exceptions.append(('territory', 'not null'))
+
+        if len(validation_exceptions) > 0:
+            raise ValidationException(validation_exceptions)
+
+    '''
     @override
     def validate(self):
 
@@ -58,7 +74,7 @@ class VendorApplicationRequest(BaseApplication):
 
         if self.territory is None:
             validation_exceptions.append(('territory','not null'))
-
+    '''
 
 class VendorApplicationResponse(BaseApplication):
     def __init__(self, **kwargs):
@@ -80,10 +96,10 @@ class VendorApplicationResponse(BaseApplication):
             raise ValueError('application_id should never be null')
 
         if self.status is None:
-            raise ValueError('status should never be null')
+            raise ValueError('status should never be null')#line 99
 
         if self.application_date is None:
-            raise ValueError('application_date should never be null')
+            raise ValueError('application_date should never be null')#line 102
 
 
 class CoffeeBeanCharacteristics(ValidatedDataModel):
@@ -141,8 +157,13 @@ class VendorProduct(ValidatedDataModel):
         self.product_name: str = kwargs.get('product_name')
         self.description: str = kwargs.get('description')
         self.initial_price: int = kwargs.get('initial_price')
-        self.coffee_bean_characteristics: CoffeeBeanCharacteristics = \
-            CoffeeBeanCharacteristics(**kwargs.get('coffee_bean_characteristics', {}))
+        #self.coffee_bean_characteristics: CoffeeBeanCharacteristics = \
+            #CoffeeBeanCharacteristics(**kwargs.get('coffee_bean_characteristics', {}))
+        cbc_data = kwargs.get('coffee_bean_characteristics')
+        if cbc_data and any(value is not None for value in cbc_data.values()):
+            self.coffee_bean_characteristics = CoffeeBeanCharacteristics(**cbc_data)
+        else:
+            self.coffee_bean_characteristics = None
 
 
 class CreateProductRequest(VendorProduct):
@@ -195,10 +216,6 @@ class UpdateProductRequest(VendorProduct):
             and len(self.description) > 10_000:
             validation_errors.append(('description', 'may not be more than 10_000 chars'))
 
-        if self.initial_price is not None \
-            and not 0 <= self.initial_price <= 999.99:
-            validation_errors.append(('initial_price', 'should be in range [0, 999.99]'))
-
         if len(validation_errors) > 0:
             raise ValidationException(validation_errors)
 
@@ -229,7 +246,9 @@ class VendorProductResponse(CreateProductRequest):
     def json(self):
         return {
             **vars(self),
-            'coffee_bean_characteristics': self.coffee_bean_characteristics.json()
+            'coffee_bean_characteristics': (
+                self.coffee_bean_characteristics.json() if self.coffee_bean_characteristics else None
+            )
         }
 
 class VendorInformation(ValidatedDataModel):
