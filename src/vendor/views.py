@@ -43,17 +43,17 @@ class VendorProductView(VendorView):
 class VendorProductDetailsView(VendorView):
     @staticmethod
     def get(request: Request, product_id: int) -> Response:
-        vendor_id: int = request.user.vendor_id #line 46
+        vendor_id: int = request.user.vendor_id
         # assert logged in vendor has permission to modify product
         dao.assert_vendor_owns_product(vendor_id, product_id)
 
         product_details = dao.get_product_details(vendor_id, product_id)
-        return Response(status=200, data=product_details.json()) #line 51
+        return Response(status=200, data=product_details.json())
 
     @staticmethod
     def patch(request: Request, product_id: int) -> Response:
         # make sure vendor owns product
-        vendor_id: int = request.user.vendor_id #line 56
+        vendor_id: int = request.user.vendor_id
         dao.assert_vendor_owns_product(vendor_id, product_id)
         # build datamodel from request.data.get('coffee_bean_characteristics')
         update_product_request = UpdateProductRequest(**request.data)
@@ -61,42 +61,42 @@ class VendorProductDetailsView(VendorView):
         # update existing table data and create if there is none
         dao.updated_existing_product(product_id, update_product_request)
         # return 204 no content resposne
-        return Response(status=204) #line 64
+        return Response(status=204)
 
     @staticmethod
     def delete(request: Request, product_id: int) -> Response:
         # make sure vendor owns product
-        vendor_id: int = request.user.vendor_id #line 69
+        vendor_id: int = request.user.vendor_id
         dao.assert_vendor_owns_product(vendor_id, product_id)
         # delete product
         dao.unlist_product(product_id)
         # return 204 no content resposne
-        return Response(status=204)#line 74
+        return Response(status=204)
 
 
 class VendorProductImagesView(VendorView):
 
     @staticmethod
     def get(request: Request, product_id: int) -> Response:
-        dao.assert_vendor_owns_product(request.user.vendor_id, product_id)#line 81
+        dao.assert_vendor_owns_product(request.user.vendor_id, product_id)
         key_image_pairs = vc.get_product_images_with_keys(product_id)
-        return Response(status=200, data=key_image_pairs)#line 83
+        return Response(status=200, data=key_image_pairs)
 
     @staticmethod
     def post(request: Request, product_id: int) -> Response:
-        vendor_id: int = request.user.vendor_id # line 87
+        vendor_id: int = request.user.vendor_id
         # assert logged in vendor has permission to modify product
         dao.assert_vendor_owns_product(vendor_id, product_id)
 
         image_id = vc.upload_product_image(product_id, request.FILES.get('image_upload'))
         # return generated id
-        return Response(status=200, data=image_id)# line 93
+        return Response(status=200, data=image_id)
 
 
 @vendor_view(['DELETE'])
 def delete_product_image(request: Request, product_id: int, image_id: str) -> Response:
-    vendor_id: int = request.user.vendor_id #line 98
+    vendor_id: int = request.user.vendor_id
     # assert logged in vendor has permission to modify product
     dao.assert_vendor_owns_product(vendor_id, product_id)
     vc.delete_product_image(product_id, image_id)
-    return Response(status=204) # line 102
+    return Response(status=204)

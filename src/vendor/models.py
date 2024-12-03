@@ -26,7 +26,7 @@ class BaseApplication(ValidatedDataModel):
         validation_exceptions = []
 
         if self.business_name is None:
-            validation_exceptions.append(('business_name','not null')) 
+            validation_exceptions.append(('business_name','not null'))
 
         if self.address_line_one is None:
             validation_exceptions.append(('address_line_one','not null'))
@@ -96,10 +96,10 @@ class VendorApplicationResponse(BaseApplication):
             raise ValueError('application_id should never be null')
 
         if self.status is None:
-            raise ValueError('status should never be null')#line 99
+            raise ValueError('status should never be null')
 
         if self.application_date is None:
-            raise ValueError('application_date should never be null')#line 102
+            raise ValueError('application_date should never be null')
 
 
 class CoffeeBeanCharacteristics(ValidatedDataModel):
