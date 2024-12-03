@@ -581,7 +581,10 @@ class GetProductsDAOTests(TestCase):
                 self.assertEqual(product.coffee_bean_characteristics.single_origin, 'n')
             else:
                 # Product 2 should have no characteristics
-                self.assertIsNone(product.coffee_bean_characteristics)
+                self.assertIsNone(product.coffee_bean_characteristics.taste_strength)
+                self.assertIsNone(product.coffee_bean_characteristics.decaf)
+                self.assertIsNone(product.coffee_bean_characteristics.flavored)
+                self.assertIsNone(product.coffee_bean_characteristics.single_origin)
 
     def test_get_products_no_active_products(self):
         # Unlist all products
@@ -637,9 +640,12 @@ class GetProductsDAOTests(TestCase):
         # Call the function
         products = vendor_dao.get_products(self.vendor_id)
 
+
         # All products should have coffee_bean_characteristics as None
         for product in products:
-            self.assertIsNone(product.coffee_bean_characteristics)
+
+            for prop in vars(product.coffee_bean_characteristics):
+                self.assertIsNone(getattr(product.coffee_bean_characteristics, prop))
 
     @patch('vendor.daos.cursor')
     def test_get_products_database_error(self, mock_cursor):
@@ -649,4 +655,3 @@ class GetProductsDAOTests(TestCase):
         with self.assertRaises(Exception) as context:
             vendor_dao.get_products(self.vendor_id)
         self.assertIn('Database error', str(context.exception))
-

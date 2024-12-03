@@ -157,13 +157,8 @@ class VendorProduct(ValidatedDataModel):
         self.product_name: str = kwargs.get('product_name')
         self.description: str = kwargs.get('description')
         self.initial_price: int = kwargs.get('initial_price')
-        #self.coffee_bean_characteristics: CoffeeBeanCharacteristics = \
-            #CoffeeBeanCharacteristics(**kwargs.get('coffee_bean_characteristics', {}))
-        cbc_data = kwargs.get('coffee_bean_characteristics')
-        if cbc_data and any(value is not None for value in cbc_data.values()):
-            self.coffee_bean_characteristics = CoffeeBeanCharacteristics(**cbc_data)
-        else:
-            self.coffee_bean_characteristics = None
+        self.coffee_bean_characteristics: CoffeeBeanCharacteristics = \
+            CoffeeBeanCharacteristics(**kwargs.get('coffee_bean_characteristics', {}))
 
 
 class CreateProductRequest(VendorProduct):
@@ -227,7 +222,6 @@ class VendorProductResponse(CreateProductRequest):
         self.date_created = kwargs.get('date_created')
 
         super().__init__(**kwargs)
-        super().validate()
 
         self.validate()
 
