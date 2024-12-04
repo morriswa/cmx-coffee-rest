@@ -48,3 +48,7 @@ def send_test_email(request: Request):
        html_message="src/static/app-email-template.html"
     )
     return Response(status=204)
+@admin_view(['GET'])
+def get_all_newsletter_subscriber_emails(request: Request) -> Response:
+    emails = admin_dao.get_all_newsletter_subscriber_emails()
+    return Response(status=200, data=[email.json() for email in emails])
