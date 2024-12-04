@@ -41,14 +41,16 @@ def get_all_vendors(request: Request) -> Response:
 @admin_view(['POST'])
 def send_subscribers_email(request: Request):
     recipients = admin_dao.get_all_newsletter_subscriber_emails()
-    Subject = "K&M Coffee Co."
-    Message = ""
+    Subject = "K&M Coffee Co. Newsletter"
     template = "src/static/app-email-template.html"
 
+    #Reads the file that holds the newsletter template and assigns it to variable used later.
+    with open("src/static/app-email-template.html", "r") as file:
+        message = file.read()
 
     mail.send_mail(
         subject=Subject,
-        message=Message,
+        message=message,
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=recipients,
         html_message=template
