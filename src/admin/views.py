@@ -39,15 +39,18 @@ def get_all_vendors(request: Request) -> Response:
     return Response(status=200, data=[vendor.json() for vendor in vendors])
 
 @admin_view(['POST'])
-def send_test_email(request: Request):
+def send_subscribers_email(request: Request):
+    recipients = admin_dao.get_all_newsletter_subscriber_emails()
+
     mail.send_mail(
         request.data['subject'],
         request.data['message'],
         settings.EMAIL_HOST_USER,
-       [request.data['recipient']],
+        recipient_list=recipients,
        html_message="src/static/app-email-template.html"
     )
     return Response(status=204)
+
 @admin_view(['GET'])
 def get_all_newsletter_subscriber_emails(request: Request) -> Response:
     emails = admin_dao.get_all_newsletter_subscriber_emails()
