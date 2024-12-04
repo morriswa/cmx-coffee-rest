@@ -82,7 +82,7 @@ def get_all_vendors() -> list[AdminVendorInfo]:
         res = cur.fetchall()
         return [AdminVendorInfo(**data) for data in res]
 
-def get_all_newsletter_subscriber_emails() -> list[CustomerPreferences]:
+def get_all_newsletter_subscriber_emails() -> list[str]:
     with connections.cursor() as cur:
         cur.execute(
             """
@@ -94,4 +94,4 @@ def get_all_newsletter_subscriber_emails() -> list[CustomerPreferences]:
                 cus.n_newsletter_subscription = 'y'
             """)
         res = cur.fetchall()
-        return [CustomerPreferences(**data) for data in res];
+        return [data['email'] for data in res];

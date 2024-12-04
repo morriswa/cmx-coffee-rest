@@ -41,13 +41,17 @@ def get_all_vendors(request: Request) -> Response:
 @admin_view(['POST'])
 def send_subscribers_email(request: Request):
     recipients = admin_dao.get_all_newsletter_subscriber_emails()
+    Subject = "K&M Coffee Co."
+    Message = ""
+    template = "src/static/app-email-template.html"
+
 
     mail.send_mail(
-        request.data['subject'],
-        request.data['message'],
-        settings.EMAIL_HOST_USER,
+        subject=Subject,
+        message=Message,
+        from_email=settings.EMAIL_HOST_USER,
         recipient_list=recipients,
-       html_message="src/static/app-email-template.html"
+        html_message=template
     )
     return Response(status=204)
 

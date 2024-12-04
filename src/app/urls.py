@@ -35,7 +35,7 @@ handler404 = lambda *args, **kwargs: HttpResponse(status=404)
 # 's/' prefix for endpoints requiring an authorization header
 urlpatterns = [
     # temp
-    path('test/email', admin_views.send_test_email),
+    # path('test/email', admin_views.send_test_email),
 
     # core app
     path('health', core_views.health),
@@ -74,5 +74,5 @@ urlpatterns = [
     path('s/admin/vendor-applications', admin_views.get_pending_vendor_applications),
     path('s/admin/vendor-application/<int:application_id>', admin_views.process_pending_vendor_application),
     path('s/admin/vendors', admin_views.get_all_vendors),
-    path('s/admin/newsletter', admin_views.send_test_email)
+    path('s/admin/newsletter', admin_views.send_subscribers_email)
 ]
