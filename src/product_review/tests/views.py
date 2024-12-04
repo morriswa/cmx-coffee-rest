@@ -17,7 +17,7 @@ class DeleteProductReviewTests(APITestCase):
         )
         cls.product_id = 4
         cls.vendor_id = 2
-        cls.order_id = uuid.uuid4() 
+        cls.order_id = uuid.uuid4()
         cls.payment_id = uuid.uuid4()
         cls.order_item_id = 28
         cls.review_id = 4  # The review ID we'll be deleting
@@ -28,7 +28,7 @@ class DeleteProductReviewTests(APITestCase):
                 INSERT INTO auth_integration (user_id, email)
                 VALUES (%s, %s)
             """, [cls.user_id, 'testuser2@example.com'])
-            
+
             # Insert customer territory
             cursor.execute("""
                 INSERT INTO customer_approved_territory (
@@ -76,7 +76,7 @@ class DeleteProductReviewTests(APITestCase):
                 )
                 VALUES (%s,%s,%s,%s,%s)
             """, [
-                cls.payment_id, cls.user_id, 'crcard', 'rahul', 'USA_KS2' 
+                cls.payment_id, cls.user_id, 'crcard', 'rahul', 'USA_KS2'
             ])
 
             # Insert order
@@ -87,7 +87,7 @@ class DeleteProductReviewTests(APITestCase):
                 )
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, [
-                cls.order_id, cls.user_id, cls.payment_id, 'paid', 'shipped', 
+                cls.order_id, cls.user_id, cls.payment_id, 'paid', 'shipped',
                 25.00, 9, 2.25, 27.25
             ])
 
@@ -108,7 +108,7 @@ class DeleteProductReviewTests(APITestCase):
                 )
                 VALUES (%s, %s, %s, %s, %s)
             """, [cls.review_id, cls.user_id, cls.product_id, 'Review to delete', 4])
-    
+
 
     def setUp(self):
         self.user = User(
@@ -119,45 +119,32 @@ class DeleteProductReviewTests(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_delete_product_review_success(self):
-        print(f"Testing with user_id: {self.user_id}")
-        print(f"User permissions: {self.user.permissions}")
-        print(f"User is_authenticated: {self.user.is_authenticated}")
-
         # First verify the review exists
         with connections.cursor() as cursor:
             cursor.execute("""
-                SELECT review_text, review_score 
-                FROM product_reviews 
+                SELECT review_text, review_score
+                FROM product_reviews
                 WHERE review_id = %s AND user_id = %s AND product_id = %s
             """, [self.review_id, self.user_id, self.product_id])
             review_before = cursor.fetchone()
-            
-        print(f"\nReview before deletion: {review_before}")
+
         self.assertIsNotNone(review_before, "Review should exist before deletion")
-        
+
         # Make DELETE request to remove review with the exact URL pattern from urls.py
         url = f'/s/product/{self.product_id}/review/{self.review_id}'
-        print(f"\nTrying DELETE request to URL: {url}")
         response = self.client.delete(url)
-        
-        print(f"API Response:")
-        print(f"Response status: {response.status_code}")
-        print(f"Response content: {response.content.decode()}")
-        if hasattr(response, 'data'):
-            print(f"Response data: {response.data}")
-        
+
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        
+
         # Verify review was deleted
         with connections.cursor() as cursor:
             cursor.execute("""
-                SELECT review_text, review_score 
-                FROM product_reviews 
+                SELECT review_text, review_score
+                FROM product_reviews
                 WHERE review_id = %s AND user_id = %s AND product_id = %s
             """, [self.review_id, self.user_id, self.product_id])
             review_after = cursor.fetchone()
-            
-        print(f"\nReview after deletion: {review_after}")
+
         self.assertIsNone(review_after, "Review should not exist after deletion")
 
 class AddProductReviewTests(APITestCase):
@@ -171,9 +158,9 @@ class AddProductReviewTests(APITestCase):
         )
         cls.product_id = 3
         cls.vendor_id = 1
-        cls.order_id = uuid.uuid4()  
-        cls.payment_id = uuid.uuid4()  
-        cls.order_item_id = 27  
+        cls.order_id = uuid.uuid4()
+        cls.payment_id = uuid.uuid4()
+        cls.order_item_id = 27
 
         with connections.cursor() as cursor:
             # Insert user into auth_integration
@@ -229,7 +216,7 @@ class AddProductReviewTests(APITestCase):
                 )
                 VALUES (%s,%s,%s,%s,%s)
             """, [
-                cls.payment_id, cls.user_id, 'crcard', 'will', 'USA_KS1' 
+                cls.payment_id, cls.user_id, 'crcard', 'will', 'USA_KS1'
             ])
 
             # Insert order to simulate purchase
@@ -263,42 +250,32 @@ class AddProductReviewTests(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_add_product_review_success(self):
-        print(f"Testing with user_id: {self.user_id}")
-        print(f"User permissions: {self.user.permissions}")
-        print(f"User is_authenticated: {self.user.is_authenticated}")
-        
+
         review_data = {
             "review_text": "Great coffee product!",
             "review_score": 5
         }
-        
+
         url = f'/s/product/{self.product_id}/reviews'
-        
+
         # Make POST request to add review
         response = self.client.post(
             url,
             data=review_data,
             format='json'
         )
-        
-        print(f"\nAPI Response:")
-        print(f"Response status: {response.status_code}")
-        print(f"Response data: {getattr(response, 'data', None)}")
-        print(f"Response content: {response.content.decode()}")
-        
+
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        
+
         # Verify review was added to database
         with connections.cursor() as cursor:
             cursor.execute("""
-                SELECT review_text, review_score 
-                FROM product_reviews 
+                SELECT review_text, review_score
+                FROM product_reviews
                 WHERE user_id = %s AND product_id = %s
             """, [self.user_id, self.product_id])
             review = cursor.fetchone()
-            
-            print(f"Retrieved review: {review}")
-            
+
         self.assertIsNotNone(review, "No review was found in the database after insertion")
         # Access dictionary values by column names instead of indices
         self.assertEqual(review['review_text'], "Great coffee product!")
