@@ -11,6 +11,12 @@ from app.exceptions import BadRequestException
 import customer_order.daos as daos
 
 
+__all__ = [
+    'CreateOrderDAOTests',
+    'DeleteOrderDAOTests',
+]
+
+
 class CreateOrderDAOTests(TestCase):
 
     def __setup_test_successfully_create_order(self):

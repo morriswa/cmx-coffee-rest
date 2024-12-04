@@ -9,6 +9,12 @@ from app import connections
 import product.daos as daos
 
 
+__all__ = [
+    'GetProductsForSaleDAOTests',
+    'GetProductDetailsDAOTests'
+]
+
+
 class GetProductsForSaleDAOTests(TestCase):
     def __setup_test_get_products_for_sale(self):
         with connections.cursor() as cur:
