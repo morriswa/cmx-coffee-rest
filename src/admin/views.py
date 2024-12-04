@@ -42,7 +42,6 @@ def get_all_vendors(request: Request) -> Response:
 def send_subscribers_email(request: Request):
     recipients = admin_dao.get_all_newsletter_subscriber_emails()
     Subject = "K&M Coffee Co. Newsletter"
-    template = "src/static/app-email-template.html"
 
     #Reads the file that holds the newsletter template and assigns it to variable used later.
     with open("src/static/app-email-template.html", "r") as file:
@@ -53,7 +52,7 @@ def send_subscribers_email(request: Request):
         message=message,
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=recipients,
-        html_message=template
+        html_message=message
     )
     return Response(status=204)
 
