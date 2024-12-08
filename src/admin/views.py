@@ -44,7 +44,7 @@ def send_subscribers_email(request: Request):
     Subject = "K&M Coffee Co. Newsletter"
 
     #Reads the file that holds the newsletter template and assigns it to variable used later.
-    with open("src/static/app-email-template.html", "r") as file:
+    with open(settings.BASE_DIR / 'app/email/app-email-template.html', "r") as file:
         message = file.read()
 
     mail.send_mail(

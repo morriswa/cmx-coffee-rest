@@ -51,7 +51,7 @@
       python manage.py migrate
 - Run on local machine http://localhost:8000
       
-      python manage.py runserver
+       
 
 ## Test Setup Guide
 - Log into postgres console on your machine with admin credential 
