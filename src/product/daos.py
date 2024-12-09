@@ -102,3 +102,38 @@ def get_product_details(product_id: int):
             raise BadRequestException(f'could not find product {product_id}')
 
         return BaseProduct(**data)
+    
+
+def get_featured_products(product: int):
+    with connections.cursor() as cur: 
+        cur.execute("""
+           select
+                product.product_id,
+                product.product_name,
+                product.description,
+                product.initial_price price,
+                pdetails.cb_decaf as decaf,
+                pdetails.cb_flavored as flavored,
+                pdetails.cb_single_origin as single_origin
+            from vendor_product product
+                left join product_characteristics pdetails
+                    on product.product_id = pdetails.product_id
+                left join vendor v
+                    on product.vendor_id = v.vendor_id
+                left join product_review review
+                    on product.product_id = review.product_id
+                where product.status = 'A'
+                    
+            GROUP BY(product.product_id, 
+                    pdetails.cb_decaf, 
+                    pdetails.cb_flavored, 
+                    pdetails.cb_single_origin)
+            HAVING AVG(review.review_score) > 3.5
+                    ORDER BY RANDOM() LIMIT 2  
+        """)
+        res = cur.fetchall()
+        products = []
+        for data in res:
+            products.append(BaseProduct(**data))
+        return products
+    
