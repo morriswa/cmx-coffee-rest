@@ -12,7 +12,7 @@ description = "Coffee eCommerce Rest API"
 requires-python = ">=3.12"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: GNU GPL License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
